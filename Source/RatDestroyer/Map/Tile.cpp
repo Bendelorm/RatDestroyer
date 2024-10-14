@@ -23,6 +23,8 @@ void ATile::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
+
 }
 
 // Called every frame

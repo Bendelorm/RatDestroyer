@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+
 #include "GridManager.h"
 #include "Tile.h"
 
@@ -41,8 +42,9 @@ void AGridManager::BeginPlay()
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 			if (TileClass)
+			{
 				GetWorld()->SpawnActor<ATile>(TileClass, TileLocation, FRotator::ZeroRotator, SpawnParams);
-
+			}
 
 		}
 	}

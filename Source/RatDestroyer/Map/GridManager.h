@@ -8,6 +8,8 @@
 #include "GridManager.generated.h"
 
 
+class ATile;
+
 UCLASS()
 class RATDESTROYER_API AGridManager : public AActor
 {
