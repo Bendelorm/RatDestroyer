@@ -32,7 +32,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Variable")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	int32 baseDmg;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
