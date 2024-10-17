@@ -8,6 +8,8 @@
 #include "Components/BoxComponent.h"
 #include "baseTurret.generated.h"
 
+
+
 UCLASS()
 class RATDESTROYER_API AbaseTurret : public AActor
 {
