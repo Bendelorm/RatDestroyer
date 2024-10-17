@@ -23,7 +23,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
 
-	
+	//Variables
+	bool bIsOccupied;
 
 protected:
 	// Called when the game starts or when spawned

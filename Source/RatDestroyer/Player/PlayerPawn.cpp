@@ -9,6 +9,7 @@
 #include "BaseGizmos/GizmoElementShared.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Tile.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -73,6 +74,11 @@ void APlayerPawn::Look(const FInputActionValue& Value)
 
 void APlayerPawn::buildTower()
 {
+	if (bCanBuild = true && bIsOccupied = false)
+	{
+
+	}
+
 
 }
 

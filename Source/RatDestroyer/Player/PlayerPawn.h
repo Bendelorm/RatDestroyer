@@ -12,6 +12,7 @@ class UCameraComponent;
 class UInputComponent;
 class UInputAction;
 class UInputMappingContext;
+class ATile;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
@@ -53,6 +54,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotationSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bCanBuild;
 
 
 
