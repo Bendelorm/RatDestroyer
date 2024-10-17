@@ -43,5 +43,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	TSubclassOf<ATile> TileClass;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
+	TArray<ATile*> TileArray;
 
+	UFUNCTION()
+	ATile* GetTileLocation(FVector Location);
 };

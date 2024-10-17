@@ -6,6 +6,7 @@
 #include "Tile.h"
 
 
+
 // Sets default values
 AGridManager::AGridManager()
 {
@@ -44,7 +45,13 @@ void AGridManager::BeginPlay()
 
 			if (TileClass)
 			{
-				GetWorld()->SpawnActor<ATile>(TileClass, TileLocation, FRotator::ZeroRotator, SpawnParams);
+				ATile* NewTitle = GetWorld()->SpawnActor<ATile>(TileClass, TileLocation, FRotator::ZeroRotator, SpawnParams);
+				
+				if (NewTitle)
+					{
+					TileArray.Add(NewTitle);
+					}
+
 			}
 
 		}
@@ -59,5 +66,20 @@ void AGridManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+ATile* AGridManager::GetTileLocation(FVector Location)
+{
+
+	for (ATile* Tile : TileArray)
+	{
+		if (Tile && Tile->GetActorLocation().Equals(Location, 50.f))
+		{
+			return Tile;
+		}
+	}
+
+
+	return nullptr;
 }
 

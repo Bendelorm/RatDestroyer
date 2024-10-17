@@ -24,7 +24,11 @@ public:
 	UBoxComponent* BoxComponent;
 
 	//Variables
+	UPROPERTY(EditDefaultsOnly)
 	bool bIsOccupied;
+
+
+
 
 protected:
 	// Called when the game starts or when spawned

@@ -62,6 +62,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	bool bCanBuild;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	TSubclassOf<AbaseTurret> baseTurret;
 
 
 	//Input Mapping Context and Actions
