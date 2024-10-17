@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Tile.h"
+#include "baseTurret.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -74,9 +75,16 @@ void APlayerPawn::Look(const FInputActionValue& Value)
 
 void APlayerPawn::buildTower()
 {
+
+	FVector TurretLocation = FVector(1, 1, 1);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
 	if (bCanBuild = true && bIsOccupied = false)
 	{
-
+		GetWorld()->SpawnActor<AbaseTurret>(baseTurretClass, TurretLocation, FRotator::ZeroRotator, SpawnParams);
 	}
 
 

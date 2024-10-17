@@ -13,6 +13,7 @@ class UInputComponent;
 class UInputAction;
 class UInputMappingContext;
 class ATile;
+class AbaseTurret;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
