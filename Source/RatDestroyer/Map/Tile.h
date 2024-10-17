@@ -23,9 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
 
-	//Variables
-	UPROPERTY(EditDefaultsOnly)
-	bool bIsOccupied;
+	
 
 
 
@@ -37,5 +35,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
+	
+	//Variables
+		UPROPERTY(EditDefaultsOnly)
+		bool bIsOccupied;
 };

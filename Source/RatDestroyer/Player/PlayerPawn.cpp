@@ -85,7 +85,7 @@ void APlayerPawn::buildTower()
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	if (bCanBuild == true)
+	if (bCanBuild == true && ATile::bIsOccupied == false)
 	{
 		GetWorld()->SpawnActor<AbaseTurret>(baseTurret, TurretLocation, FRotator::ZeroRotator, SpawnParams);
 

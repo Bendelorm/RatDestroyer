@@ -45,11 +45,11 @@ void AGridManager::BeginPlay()
 
 			if (TileClass)
 			{
-				ATile* NewTitle = GetWorld()->SpawnActor<ATile>(TileClass, TileLocation, FRotator::ZeroRotator, SpawnParams);
+				ATile* NewTile = GetWorld()->SpawnActor<ATile>(TileClass, TileLocation, FRotator::ZeroRotator, SpawnParams);
 				
-				if (NewTitle)
+				if (NewTile)
 					{
-					TileArray.Add(NewTitle);
+					TileArray.Add(NewTile);
 					}
 
 			}
