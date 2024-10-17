@@ -3,11 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EnhancedInputSubsystemInterface.h"
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
-class USpringArmComponent;
+struct FInputActionValue;
 class UCameraComponent;
+class UInputComponent;
+class UInputAction;
+class UInputMappingContext;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
@@ -25,82 +29,65 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
-	//Components for player
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Player")
-	USceneComponent* SceneComponent;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Player")
-	USpringArmComponent* SpringArmComponent;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Player")
-	UCameraComponent* CameraComponent;
-
-
-	//Functions for camera control
-	UFUNCTION()
-	void Forward(float AxisValue);
-
-	UFUNCTION()
-	void Right(float AxisValue);
-
-	UFUNCTION()
-	void Zoom(float AxisValue);
-
-	UFUNCTION()
-	void RotateRight();
-
-	UFUNCTION()
-	void RotateLeft();
-
-	UFUNCTION()
-	void EnableRotate();
-
-	UFUNCTION()
-	void DisableRotate();
-
-	UFUNCTION()
-	void RotateHorizontal(float AxisValue);
-
-	UFUNCTION()
-	void RotateVertical(float AxisValue);
-
-	UFUNCTION()
-	void CameraBounds();
-
-
-	//Player controlled camera settings
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSettings")
-	float MoveSpeed = 20.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSettings")
-	float RotateSpeed = 2.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSettings")
-	float RotatePitchMin = 10.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSettings")
-	float RotatePitchMax = 80.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSettings")
-	float ZoomSpeed = 2.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSettings")
-	float MinZoom = 500.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSettings")
-	float MaxZoom = 4000.0f;
+	//Variables
+	UPROPERTY()
+	TObjectPtr<APlayerController> PlayerController;
 
 	UPROPERTY()
-	FVector TargetLocation;
+	TObjectPtr<UCameraComponent> CameraComponent;
 
 	UPROPERTY()
-	FRotator TargetRotation;
+	FVector2D CurrentInputMoveSpeed;
 
-	UPROPERTY()
-	float TargetZoom;
+	UPROPERTY(EditDefaultsOnly)
+	FVector2D ScreenEdgePadding;
 
-	UPROPERTY()
-	bool CanRotate;
+	UPROPERTY(EditDefaultsOnly)
+	FVector2D MoveSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ZoomSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool ShouldRotate;
+
+	UPROPERTY(EditDefaultsOnly)
+	float RotationSpeed;
+
+
+
+	//Input Mapping Context and Actions
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputMappingContext* IMC;;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* ZoomAction;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* RotateAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* LookAction;
+
+
+	//Functions
+	void MoveTriggered(const FInputActionValue& Value);
+
+	void MoveCompleted();
+
+	void Zoom(const FInputActionValue& Value);
+
+	void RotationStarted();
+
+	void RotationCompleted();
+
+	void Look(const FInputActionValue& Value);
+
+
+
 
 protected:
 	// Called when the game starts or when spawned

@@ -3,6 +3,9 @@
 
 #include "PlayerPawn.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputAction.h"
 #include "BaseGizmos/GizmoElementShared.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -14,16 +17,58 @@ APlayerPawn::APlayerPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
-	RootComponent = SceneComponent;
+	RootComponent = CreateDefaultSubobject<USceneComponent>("DefaultSceneRoot");
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
+	CameraComponent->SetupAttachment(RootComponent);
 
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->TargetArmLength = 2000.0f;
-	SpringArmComponent->bDoCollisionTest = false;
+	ShouldRotate = false;
+	MoveSpeed = FVector2D(500, 500);
+	ScreenEdgePadding = FVector2D(50, 50);
+	ZoomSpeed = 200;
+	RotationSpeed = 50;
 
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(SpringArmComponent);
+	SetActorRotation(FRotator::MakeFromEuler(FVector3d(0, -30, 0)));
+
+}
+
+void APlayerPawn::MoveTriggered(const FInputActionValue& Value)
+{
+	CurrentInputMoveSpeed = Value.Get<FVector2D>();
+}
+
+void APlayerPawn::MoveCompleted()
+{
+	CurrentInputMoveSpeed = FVector2D::Zero();
+}
+
+void APlayerPawn::Zoom(const FInputActionValue& Value)
+{
+	auto Location = GetActorLocation();
+	Location.Z += Value.Get<float>() * ZoomSpeed * FApp::GetDeltaTime();
+	SetActorLocation(Location);
+}
+
+void APlayerPawn::RotationStarted()
+{
+	ShouldRotate = true;
+}
+
+void APlayerPawn::RotationCompleted()
+{
+	ShouldRotate = false;
+}
+
+void APlayerPawn::Look(const FInputActionValue& Value)
+{
+	const auto& LookVector = Value.Get<FVector2D>();
+
+	if (ShouldRotate)
+	{
+		FRotator CurrentRotation = GetActorRotation();
+		CurrentRotation.Pitch += RotationSpeed * FApp::GetDeltaTime() * LookVector.Y;
+		CurrentRotation.Yaw += RotationSpeed * FApp::GetDeltaTime() * LookVector.X;
+		SetActorRotation(CurrentRotation);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -31,11 +76,15 @@ void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//set initial zoom, location, rotation
-	TargetLocation = GetActorLocation();
-	TargetZoom = 3000.f;
-	const FRotator Rotation = SpringArmComponent->GetRelativeRotation();
-	TargetRotation = FRotator(Rotation.Pitch + -50, Rotation.Yaw, 0.0f);
+	if(PlayerController = Cast<APlayerController>(Controller); IsValid(PlayerController))
+	{
+		PlayerController->SetShowMouseCursor(true);
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(IMC, 0);
+		}
+	}
+
 }
 
 // Called every frame
@@ -43,126 +92,56 @@ void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CameraBounds();
+	//Find the correct movement speed of the camera
+	auto CurrentMoveSpeed = CurrentInputMoveSpeed;
+	if (FVector2D MousePosition; CurrentInputMoveSpeed.X == 0 && CurrentInputMoveSpeed.Y == 0 && PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y))
+	{
+		int32 ViewportWidth, ViewportHeight;
+		PlayerController->GetViewportSize(ViewportWidth, ViewportHeight);
 
-	//moving the pawn in the correct direction
-	const FVector InterpolatedLocation = UKismetMathLibrary::VInterpTo(GetActorLocation(), TargetLocation, DeltaTime, MoveSpeed);
-	SetActorLocation(InterpolatedLocation);
+		const auto X =
+			-(MousePosition.X <= ScreenEdgePadding.X) | (MousePosition.X >= ViewportWidth - ScreenEdgePadding.X);
 
-	//zooming the camera in the correct direction
-	const float InterpolatedZoom = UKismetMathLibrary::FInterpTo(SpringArmComponent->TargetArmLength, TargetZoom, DeltaTime, ZoomSpeed);
-	SpringArmComponent->TargetArmLength = InterpolatedZoom;
+		const auto Y =
+			(MousePosition.Y <= ScreenEdgePadding.Y) | -(MousePosition.Y >= ViewportHeight - ScreenEdgePadding.Y);
 
-	//rotate the camera in the correct direction
-	const FRotator InterpolatedRotation = UKismetMathLibrary::RInterpTo(SpringArmComponent->GetRelativeRotation(), TargetRotation, DeltaTime, RotateSpeed);
-	SpringArmComponent->SetRelativeRotation(InterpolatedRotation);
+		CurrentMoveSpeed = FVector2D(X, Y);
+	}
+
+	//Move camera
+
+	auto ForwardVector = FVector(GetActorForwardVector().X, GetActorForwardVector().Y, 0);
+	ForwardVector.Normalize();
+
+	const auto Forward = ForwardVector * CurrentMoveSpeed.Y * MoveSpeed.Y * DeltaTime;
+	const auto Sideways = GetActorRightVector() * CurrentMoveSpeed.X * MoveSpeed.X * DeltaTime;
+
+	const auto NextLocation = GetActorLocation() + Forward + Sideways;
+	SetActorLocation(NextLocation);
+
 }
 
 // Called to bind functionality to input
 void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("Forward"), this, &APlayerPawn::Forward);
-	PlayerInputComponent->BindAxis(TEXT("Right"), this, &APlayerPawn::Right);
-	PlayerInputComponent->BindAxis(TEXT("Zoom"), this, &APlayerPawn::Zoom);
-	PlayerInputComponent->BindAxis(TEXT("RotateHorizontal"), this, &APlayerPawn::RotateHorizontal);
-	PlayerInputComponent->BindAxis(TEXT("RotateVertical"), this, &APlayerPawn::RotateVertical);
-
-	PlayerInputComponent->BindAction(TEXT("RotateRight"), IE_Pressed, this, &APlayerPawn::RotateRight);
-	PlayerInputComponent->BindAction(TEXT("RotateLeft"), IE_Pressed, this, &APlayerPawn::RotateLeft);
-	PlayerInputComponent->BindAction(TEXT("Rotate"), IE_Pressed, this, &APlayerPawn::EnableRotate);
-	PlayerInputComponent->BindAction(TEXT("Rotate"), IE_Released, this, &APlayerPawn::DisableRotate);
-
-}
-
-void APlayerPawn::Forward(float AxisValue)
-{
-	if(AxisValue == 0.f)
+	if (EnhancedInputComponent)
 	{
-		return;
+		//Move camera
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerPawn::MoveTriggered);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerPawn::MoveCompleted);
+
+		//Zoom camera
+		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &APlayerPawn::Zoom);
+
+		//Rotate camera
+		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Started, this, &APlayerPawn::RotationStarted);
+		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Canceled, this, &APlayerPawn::RotationCompleted);
+		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Completed, this, &APlayerPawn::RotationCompleted);
+
+		//Look
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerPawn::Look);
+
 	}
-	TargetLocation = SpringArmComponent->GetForwardVector() * AxisValue * MoveSpeed * TargetLocation;
-}
-
-void APlayerPawn::Right(float AxisValue)
-{
-	if (AxisValue == 0.f)
-	{
-		return;
-	}
-	TargetLocation = SpringArmComponent->GetRightVector() * AxisValue * MoveSpeed * TargetLocation;
-}
-
-void APlayerPawn::Zoom(float AxisValue)
-{
-	if (AxisValue == 0.f)
-	{
-		return;
-	}
-	const float Zoom = AxisValue * 100.0f;
-	TargetZoom = FMath::Clamp(Zoom + TargetZoom, MinZoom, MaxZoom);
-}
-
-void APlayerPawn::RotateRight()
-{
-	TargetRotation = UKismetMathLibrary::ComposeRotators(TargetRotation, FRotator(0.0f, -45, 0.0f));
-}
-
-void APlayerPawn::RotateLeft()
-{
-	TargetRotation = UKismetMathLibrary::ComposeRotators(TargetRotation, FRotator(0.0f, 45, 0.0f));
-}
-
-void APlayerPawn::EnableRotate()
-{
-	CanRotate = true;
-}
-
-void APlayerPawn::DisableRotate()
-{
-	CanRotate = false;
-}
-
-void APlayerPawn::RotateHorizontal(float AxisValue)
-{
-	if (AxisValue == 0.f)
-	{
-		return;
-	}
-	if (CanRotate)
-	{
-		TargetRotation = UKismetMathLibrary::ComposeRotators(TargetRotation, FRotator(0.0f, AxisValue, 0.f));
-	}
-}
-
-void APlayerPawn::RotateVertical(float AxisValue)
-{
-	if (AxisValue == 0.f)
-	{
-		return;
-	}
-	if (CanRotate)
-	{
-		TargetRotation = UKismetMathLibrary::ComposeRotators(TargetRotation, FRotator(AxisValue, 0.f, 0.f));
-	}
-}
-
-void APlayerPawn::CameraBounds()
-{
-	float NewPitch = TargetRotation.Pitch;
-	if(TargetRotation.Pitch < (RotatePitchMax * -1))
-	{
-		NewPitch = (RotatePitchMax * -1);
-	}
-	else if(TargetRotation.Pitch > (RotatePitchMin * -1))
-	{
-		NewPitch = (RotatePitchMin * -1);
-	}
-
-	//Set the new pitch and clamp any roll
-	TargetRotation = FRotator(NewPitch, TargetRotation.Yaw, 0.f);
-
-	//Clamp desired location to within bounds
-	TargetLocation = FVector(TargetLocation.X, TargetLocation.Y, 0.f);
 }
