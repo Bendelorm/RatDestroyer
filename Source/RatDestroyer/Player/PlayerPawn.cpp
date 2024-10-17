@@ -71,6 +71,11 @@ void APlayerPawn::Look(const FInputActionValue& Value)
 	}
 }
 
+void APlayerPawn::buildTower()
+{
+
+}
+
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
 {
