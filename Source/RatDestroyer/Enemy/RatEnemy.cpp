@@ -9,6 +9,11 @@ ARatEnemy::ARatEnemy()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	MovementSpeed = 300.0f;
+	Health = 10;
+	bIsmoving = false;
+	Damage = 1;
+	
 }
 
 // Called when the game starts or when spawned
@@ -25,10 +30,4 @@ void ARatEnemy::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void ARatEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
 
