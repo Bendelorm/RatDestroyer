@@ -16,6 +16,7 @@ class UInputComponent;
 class UInputAction;
 class UInputMappingContext;
 class ATile;
+class AGridManager;
 class AbaseTurret;
 
 UCLASS()

@@ -6,6 +6,7 @@
 #include "AnimationEditorViewportClient.h"
 #include "../Map/Tile.h"
 #include "../Turret/baseTurret.h"
+#include "../Map/GridManager.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
@@ -93,20 +94,20 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 	}
 }
 
+
 //void APlayerPawn::buildTower()
 //{
 //
-//	FVector TurretLocation = FVector(1, 1, 1);
+//	//if (AGridManager)
+//	//{
+//	//	ATile* TargetTile = AGridManager->GetTileLocation(TargetLocation);
 //
-//	FActorSpawnParameters SpawnParams;
-//	SpawnParams.Owner = this;
-//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+//	//	if (TargetTile)
+//	//	{
+//	//		TargetTile->ChangeDebugColor(FColor::Red)
+//	//	}
 //
-//	if (bCanBuild == true && ATile::bIsOccupied == false)
-//	{
-//		GetWorld()->SpawnActor<AbaseTurret>(baseTurret, TurretLocation, FRotator::ZeroRotator, SpawnParams);
-//
-//	}
+//	//}
 //
 //
 //}
