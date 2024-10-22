@@ -76,23 +76,23 @@ void APlayerPawn::Look(const FInputActionValue& Value)
 	}
 }
 
-void APlayerPawn::buildTower()
-{
-
-	FVector TurretLocation = FVector(1, 1, 1);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	if (bCanBuild == true && ATile::bIsOccupied == false)
-	{
-		GetWorld()->SpawnActor<AbaseTurret>(baseTurret, TurretLocation, FRotator::ZeroRotator, SpawnParams);
-
-	}
-
-
-}
+//void APlayerPawn::buildTower()
+//{
+//
+//	FVector TurretLocation = FVector(1, 1, 1);
+//
+//	FActorSpawnParameters SpawnParams;
+//	SpawnParams.Owner = this;
+//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+//
+//	if (bCanBuild == true && ATile::bIsOccupied == false)
+//	{
+//		GetWorld()->SpawnActor<AbaseTurret>(baseTurret, TurretLocation, FRotator::ZeroRotator, SpawnParams);
+//
+//	}
+//
+//
+//}
 
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
