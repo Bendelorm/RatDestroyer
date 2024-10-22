@@ -36,7 +36,7 @@ public:
 	float Health;
 
 	UPROPERTY(VisibleAnywhere, Category = "RatEnemy")
-	bool bIsmoving;
+	bool bIsMoving;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RatEnemy")
 	float Damage;

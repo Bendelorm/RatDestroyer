@@ -2,6 +2,8 @@
 
 
 #include "RatEnemy.h"
+#include "GameFramework/CharacterMovementComponent.h"
+//#include "RatDestroyer/TreeTesting/RDTreeNode.h"
 
 // Sets default values
 ARatEnemy::ARatEnemy()
@@ -11,9 +13,10 @@ ARatEnemy::ARatEnemy()
 
 	MovementSpeed = 300.0f;
 	Health = 10;
-	bIsmoving = false;
+	bIsMoving = false;
 	Damage = 1;
 	
+	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }
 
 // Called when the game starts or when spawned
@@ -23,11 +26,39 @@ void ARatEnemy::BeginPlay()
 	
 }
 
-// Called every frame
-void ARatEnemy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-}
+// Called every frame put in kode for pathfinding for enemy
+// void ARatEnemy::Tick(float DeltaTime)
+// {
+// 	Super::Tick(DeltaTime);
+//
+//
+// 	if (bIsMoving && ChildNode() > 0 && CurrentNode < ARDTreeNode())
+// 	{
+// 		FVector TargetLocation = ARDTreeNode()[CurrentNode]->GetActorLocation();
+// 		FVector Direction =(GetTargetLocation()- GetActorLocation().GetSafeNormal());
+// 		FVector NewLocation = GetActorLocation() + Direction * MovementSpeed * DeltaTime;
+//
+// 		SetActorLocation(NewLocation);
+//
+// 		if (FVector::Dist(GetActorLocation(), TargetLocation) < 10.0f)
+// 		{
+// 			CurrentNode++;
+//
+// 			if (CurrentNode >= ARDTreeNode())
+// 			{
+// 				bIsMoving = false;
+// 			}
+// 		}
+// 	}
+// }
+// void ARatEnemy::Path
+// {
+// 	ARDTreeNode = newPath;
+//}
+// void ARatEnemy::StartMoving()
+// {
+// 	bIsMoving = true;
+// }
 
 
