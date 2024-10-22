@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "DrawDebugHelpers.h"
 #include "Tile.generated.h"
 
 UCLASS()
@@ -23,7 +24,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
 
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Color")
+	FColor DebugBoxColor;
 
 
 
@@ -37,6 +39,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	
+	//Functions
+	UFUNCTION()
+	void changeDebugColor(FColor NewColor);
+
+
+
 	//Variables
 		UPROPERTY(EditDefaultsOnly)
 		bool bIsOccupied;

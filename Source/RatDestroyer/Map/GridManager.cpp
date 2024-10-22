@@ -36,7 +36,7 @@ void AGridManager::BeginPlay()
 	{
 		for (int32 Y = 0; Y < GridSizeY; ++Y)
 		{
-			FVector TileLocation = FVector(X * TileSize, Y * TileSize, 0.0f);
+			FVector TileLocation = FVector(X * TileSize, Y * TileSize, 50.f);
 
 
 			FActorSpawnParameters SpawnParams;

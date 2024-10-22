@@ -15,6 +15,7 @@ ATile::ATile()
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	RootComponent = StaticMeshComponent;
 
+    DebugBoxColor = FColor::Green;
 
 }
 
@@ -23,8 +24,7 @@ void ATile::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
-
+    
 }
 
 // Called every frame
@@ -32,5 +32,22 @@ void ATile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	FVector BoxLocation = GetActorLocation() + FVector(0.f, 0.f, 50.f);
+	FVector BoxExtent = FVector(50.f, 50.f, 50.f);
+	FQuat BoxRotation = FQuat::Identity;
+
+	// Draw the debug box using the stored DebugBoxColor
+	DrawDebugBox(World, BoxLocation, BoxExtent, BoxRotation, DebugBoxColor, false, -1.f, 0, 5.f);
+
+
+}
+
+void ATile::changeDebugColor(FColor NewColor)
+{
+	DebugBoxColor = NewColor;
 }
 
