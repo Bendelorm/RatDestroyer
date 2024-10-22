@@ -2,6 +2,8 @@
 
 
 #include "PlayerPawn.h"
+
+#include "AnimationEditorViewportClient.h"
 #include "../Map/Tile.h"
 #include "../Turret/baseTurret.h"
 #include "EnhancedInputComponent.h"
@@ -76,6 +78,21 @@ void APlayerPawn::Look(const FInputActionValue& Value)
 	}
 }
 
+void APlayerPawn::Select(const FInputActionValue& Value)
+{
+	FHitResult HitResult;
+	if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
+	{
+		AActor* SelectedActor = HitResult.GetActor();
+		if (SelectedActor)
+		{
+			//debug for testing
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You selected: %s"), *SelectedActor->GetName()));
+			//Code for what happens when you select something
+		}
+	}
+}
+
 //void APlayerPawn::buildTower()
 //{
 //
@@ -102,6 +119,8 @@ void APlayerPawn::BeginPlay()
 	if(PlayerController = Cast<APlayerController>(Controller); IsValid(PlayerController))
 	{
 		PlayerController->SetShowMouseCursor(true);
+		PlayerController->bEnableMouseOverEvents = true;
+		PlayerController->bEnableClickEvents = true;
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(IMC, 0);
@@ -168,6 +187,10 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 		//Look
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerPawn::Look);
+
+		//Select with mouse
+		EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Triggered, this, &APlayerPawn::Select);
+
 
 	}
 }
