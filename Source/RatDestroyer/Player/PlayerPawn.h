@@ -82,6 +82,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* SelectAction;
+
 
 	//Functions
 	void MoveTriggered(const FInputActionValue& Value);
@@ -96,7 +99,9 @@ public:
 
 	void Look(const FInputActionValue& Value);
 
-	void buildTower();
+	void Select(const FInputActionValue& Value);
+
+	//void buildTower();
 
 
 
