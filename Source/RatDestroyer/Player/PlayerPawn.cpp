@@ -2,14 +2,19 @@
 
 
 #include "PlayerPawn.h"
-
+#include "../Map/Tile.h"
+#include "../Turret/baseTurret.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "BaseGizmos/GizmoElementShared.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+
 #include "Kismet/KismetMathLibrary.h"
+
+
+
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -71,6 +76,24 @@ void APlayerPawn::Look(const FInputActionValue& Value)
 	}
 }
 
+//void APlayerPawn::buildTower()
+//{
+//
+//	FVector TurretLocation = FVector(1, 1, 1);
+//
+//	FActorSpawnParameters SpawnParams;
+//	SpawnParams.Owner = this;
+//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+//
+//	if (bCanBuild == true && ATile::bIsOccupied == false)
+//	{
+//		GetWorld()->SpawnActor<AbaseTurret>(baseTurret, TurretLocation, FRotator::ZeroRotator, SpawnParams);
+//
+//	}
+//
+//
+//}
+
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
 {
@@ -86,6 +109,9 @@ void APlayerPawn::BeginPlay()
 	}
 
 }
+
+
+
 
 // Called every frame
 void APlayerPawn::Tick(float DeltaTime)

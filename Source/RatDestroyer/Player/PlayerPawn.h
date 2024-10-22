@@ -7,11 +7,16 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+
+
+
 struct FInputActionValue;
 class UCameraComponent;
 class UInputComponent;
 class UInputAction;
 class UInputMappingContext;
+class ATile;
+class AbaseTurret;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
@@ -54,6 +59,11 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float RotationSpeed;
 
+	UPROPERTY(EditDefaultsOnly)
+	bool bCanBuild;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	TSubclassOf<AbaseTurret> baseTurret;
 
 
 	//Input Mapping Context and Actions
@@ -86,6 +96,7 @@ public:
 
 	void Look(const FInputActionValue& Value);
 
+	void buildTower();
 
 
 
