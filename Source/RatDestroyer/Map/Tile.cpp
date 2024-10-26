@@ -15,16 +15,45 @@ ATile::ATile()
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	RootComponent = StaticMeshComponent;
 
+	MaterialOne = CreateDefaultSubobject<UMaterialInterface>("MaterialOne");
+	MaterialTwo = CreateDefaultSubobject<UMaterialInterface>("MaterialTwo");
+
+	StaticMeshComponent->OnBeginCursorOver.AddDynamic(this, &ATile::ChangeMatOnMouseOver);
+	StaticMeshComponent->OnEndCursorOver.AddDynamic(this, &ATile::EndMatOnMouseOver);
+
     DebugBoxColor = FColor::Green;
 
+	bHasTower = false;
+	Tags.Add("Buildable");
+}
+
+void ATile::ChangeMatOnMouseOver(UPrimitiveComponent* TouchedComponent)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Moused over lol")));
+	StaticMeshComponent->SetMaterial(0, MaterialTwo);
+}
+
+void ATile::EndMatOnMouseOver(UPrimitiveComponent* TouchedComponent)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Stopped mousing over lol")));
+	StaticMeshComponent->SetMaterial(0, MaterialOne);
+}
+
+void ATile::SetHasTower(bool bHasNewTower)
+{
+	bHasTower = bHasNewTower;
+}
+
+bool ATile::GetHasTower()
+{
+	return bHasTower;
 }
 
 // Called when the game starts or when spawned
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-	
-    
+	StaticMeshComponent->SetMaterial(0, MaterialOne);
 }
 
 // Called every frame
@@ -45,9 +74,3 @@ void ATile::Tick(float DeltaTime)
 
 
 }
-
-void ATile::changeDebugColor(FColor NewColor)
-{
-	DebugBoxColor = NewColor;
-}
-

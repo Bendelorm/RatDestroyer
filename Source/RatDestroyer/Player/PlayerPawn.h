@@ -15,9 +15,8 @@ class UCameraComponent;
 class UInputComponent;
 class UInputAction;
 class UInputMappingContext;
+class ARDTowerActor;
 class ATile;
-class AGridManager;
-class AbaseTurret;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
@@ -27,6 +26,10 @@ class RATDESTROYER_API APlayerPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
+
+	TObjectPtr<ATile> Tile;
+
+	TObjectPtr<ARDTowerActor> Tower;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -63,8 +66,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	bool bCanBuild;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	TSubclassOf<AbaseTurret> baseTurret;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
+	TSubclassOf<ARDTowerActor> BaseTower;
 
 
 	//Input Mapping Context and Actions
@@ -86,6 +89,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* SelectAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* BuildModeAction;
 
 	//Functions
 	void MoveTriggered(const FInputActionValue& Value);
@@ -102,9 +107,7 @@ public:
 
 	void Select(const FInputActionValue& Value);
 
-	//void buildTower();
-
-
+	void BuildMode(const FInputActionValue& Value);
 
 protected:
 	// Called when the game starts or when spawned

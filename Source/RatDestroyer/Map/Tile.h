@@ -27,7 +27,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Color")
 	FColor DebugBoxColor;
 
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* MaterialOne;
 
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* MaterialTwo;
+
+	UPROPERTY()
+	bool bHasTower;
 
 
 protected:
@@ -40,12 +47,21 @@ public:
 	
 	
 	//Functions
-	UFUNCTION()
-	void changeDebugColor(FColor NewColor);
 
+	UFUNCTION()
+	void ChangeMatOnMouseOver(UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void EndMatOnMouseOver(UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void SetHasTower(bool bHasNewTower);
+
+	UFUNCTION()
+	bool GetHasTower();
 
 
 	//Variables
-		UPROPERTY(EditDefaultsOnly)
-		bool bIsOccupied;
+	UPROPERTY(EditDefaultsOnly)
+	bool bIsOccupied;
 };

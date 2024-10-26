@@ -4,16 +4,14 @@
 #include "PlayerPawn.h"
 
 #include "AnimationEditorViewportClient.h"
-#include "../Map/Tile.h"
-#include "../Turret/baseTurret.h"
-#include "../Map/GridManager.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "BaseGizmos/GizmoElementShared.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-
+#include "RatDestroyer/Tower/RDTowerActor.h"
+#include "RatDestroyer/Map/Tile.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -30,9 +28,10 @@ APlayerPawn::APlayerPawn()
 	CameraComponent->SetupAttachment(RootComponent);
 
 	ShouldRotate = false;
+	bCanBuild = false;
 	MoveSpeed = FVector2D(500, 500);
 	ScreenEdgePadding = FVector2D(50, 50);
-	ZoomSpeed = 200;
+	ZoomSpeed = 800;
 	RotationSpeed = 50;
 
 	SetActorRotation(FRotator::MakeFromEuler(FVector3d(0, -30, 0)));
@@ -84,33 +83,48 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 	FHitResult HitResult;
 	if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
 	{
-		AActor* SelectedActor = HitResult.GetActor();
-		if (SelectedActor)
+		if (bCanBuild)
 		{
-			//debug for testing
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You selected: %s"), *SelectedActor->GetName()));
-			//Code for what happens when you select something
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("bCanBuild is active")));
+
+			if (BaseTower != nullptr)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Base tower is not a nullptr")));
+
+				if (HitResult.GetActor()->ActorHasTag("Buildable"))
+				{
+					
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Tower has been built")));
+				}
+			}
+		}
+		else
+		{
+			AActor* SelectedActor = HitResult.GetActor();
+			if (SelectedActor)
+			{
+				//debug for testing
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You selected: %s"), *SelectedActor->GetName()));
+				//Code for what happens when you select something
+			}
 		}
 	}
 }
 
+void APlayerPawn::BuildMode(const FInputActionValue& Value)
+{
+	if (bCanBuild)
+	{
+		bCanBuild = false;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Now you can't build")));
+	}
+	else
+	{
+		bCanBuild = true;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You can now build")));
 
-//void APlayerPawn::buildTower()
-//{
-//
-//	//if (AGridManager)
-//	//{
-//	//	ATile* TargetTile = AGridManager->GetTileLocation(TargetLocation);
-//
-//	//	if (TargetTile)
-//	//	{
-//	//		TargetTile->ChangeDebugColor(FColor::Red)
-//	//	}
-//
-//	//}
-//
-//
-//}
+	}
+}
 
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
@@ -192,6 +206,6 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		//Select with mouse
 		EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Triggered, this, &APlayerPawn::Select);
 
-
+		EnhancedInputComponent->BindAction(BuildModeAction, ETriggerEvent::Triggered, this, &APlayerPawn::BuildMode);
 	}
 }
