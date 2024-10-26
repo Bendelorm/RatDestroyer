@@ -19,7 +19,7 @@ public:
 	ATile();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	UStaticMeshComponent* StaticMeshComponent;
+	UStaticMeshComponent* TileMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
@@ -59,6 +59,8 @@ public:
 
 	UFUNCTION()
 	bool GetHasTower();
+
+	UStaticMeshComponent* GetStaticMesh() const;
 
 
 	//Variables

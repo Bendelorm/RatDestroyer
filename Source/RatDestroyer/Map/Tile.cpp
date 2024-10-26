@@ -9,17 +9,17 @@ ATile::ATile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-	RootComponent = StaticMeshComponent;
+	TileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	RootComponent = TileMeshComponent;
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
-	RootComponent = StaticMeshComponent;
+	BoxComponent->SetupAttachment(TileMeshComponent);
 
 	MaterialOne = CreateDefaultSubobject<UMaterialInterface>("MaterialOne");
 	MaterialTwo = CreateDefaultSubobject<UMaterialInterface>("MaterialTwo");
 
-	StaticMeshComponent->OnBeginCursorOver.AddDynamic(this, &ATile::ChangeMatOnMouseOver);
-	StaticMeshComponent->OnEndCursorOver.AddDynamic(this, &ATile::EndMatOnMouseOver);
+	TileMeshComponent->OnBeginCursorOver.AddDynamic(this, &ATile::ChangeMatOnMouseOver);
+	TileMeshComponent->OnEndCursorOver.AddDynamic(this, &ATile::EndMatOnMouseOver);
 
     DebugBoxColor = FColor::Green;
 
@@ -30,13 +30,13 @@ ATile::ATile()
 void ATile::ChangeMatOnMouseOver(UPrimitiveComponent* TouchedComponent)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Moused over lol")));
-	StaticMeshComponent->SetMaterial(0, MaterialTwo);
+	TileMeshComponent->SetMaterial(0, MaterialTwo);
 }
 
 void ATile::EndMatOnMouseOver(UPrimitiveComponent* TouchedComponent)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Stopped mousing over lol")));
-	StaticMeshComponent->SetMaterial(0, MaterialOne);
+	TileMeshComponent->SetMaterial(0, MaterialOne);
 }
 
 void ATile::SetHasTower(bool bHasNewTower)
@@ -49,11 +49,16 @@ bool ATile::GetHasTower()
 	return bHasTower;
 }
 
+UStaticMeshComponent* ATile::GetStaticMesh() const
+{
+	return TileMeshComponent;
+}
+
 // Called when the game starts or when spawned
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-	StaticMeshComponent->SetMaterial(0, MaterialOne);
+	TileMeshComponent->SetMaterial(0, MaterialOne);
 }
 
 // Called every frame

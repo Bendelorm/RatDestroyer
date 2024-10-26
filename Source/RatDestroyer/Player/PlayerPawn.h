@@ -17,6 +17,7 @@ class UInputAction;
 class UInputMappingContext;
 class ARDTowerActor;
 class ATile;
+class AGridManager;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
@@ -27,9 +28,11 @@ public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
 
-	TObjectPtr<ATile> Tile;
+	TObjectPtr<AGridManager> GridManager;
 
-	TObjectPtr<ARDTowerActor> Tower;
+	TObjectPtr<ATile> SelectedTile;
+
+	TObjectPtr<ARDTowerActor> TheTowerActor;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

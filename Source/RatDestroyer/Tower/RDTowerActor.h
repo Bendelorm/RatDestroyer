@@ -42,8 +42,6 @@ public:
 
 
 	//Functions
-	UFUNCTION()
-	void BuildTower(ATile* Tile);
 
 protected:
 	// Called when the game starts or when spawned

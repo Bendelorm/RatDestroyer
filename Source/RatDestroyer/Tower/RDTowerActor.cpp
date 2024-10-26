@@ -22,12 +22,6 @@ ARDTowerActor::ARDTowerActor()
 
 }
 
-void ARDTowerActor::BuildTower(ATile* TargetTile)
-{
-	Tile = TargetTile;
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Tile->StaticMeshComponent, AttachmentRules, FName(TEXT("TowerSocket")));
-}
 
 // Called when the game starts or when spawned
 void ARDTowerActor::BeginPlay()

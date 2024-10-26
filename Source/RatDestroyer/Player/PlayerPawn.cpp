@@ -6,11 +6,14 @@
 #include "AnimationEditorViewportClient.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "IContentBrowserSingleton.h"
 #include "InputAction.h"
 #include "BaseGizmos/GizmoElementShared.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "RatDestroyer/Tower/RDTowerActor.h"
+#include "RatDestroyer/Map/GridManager.h"
 #include "RatDestroyer/Map/Tile.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -86,15 +89,18 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 		if (bCanBuild)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("bCanBuild is active")));
-
-			if (BaseTower != nullptr)
+			if (BaseTower != nullptr && HitResult.GetActor()->ActorHasTag("Buildable"))
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Base tower is not a nullptr")));
-
-				if (HitResult.GetActor()->ActorHasTag("Buildable"))
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Base tower is not a nullptr and u clicked a tile")));
+				ATile* ClickedTile = Cast<ATile>(HitResult.GetActor());
+				for (ATile* TileInArray : GridManager->TileArray)
 				{
-					
-					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Tower has been built")));
+					if (TileInArray == ClickedTile)
+					{
+						SelectedTile = TileInArray;
+						FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+						TheTowerActor->AttachToComponent(SelectedTile->GetStaticMesh(), AttachmentRules, FName(TEXT("TowerSocket")));
+					}
 				}
 			}
 		}
@@ -131,11 +137,13 @@ void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	if(PlayerController = Cast<APlayerController>(Controller); IsValid(PlayerController))
 	{
 		PlayerController->SetShowMouseCursor(true);
 		PlayerController->bEnableMouseOverEvents = true;
 		PlayerController->bEnableClickEvents = true;
+		GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(IMC, 0);
