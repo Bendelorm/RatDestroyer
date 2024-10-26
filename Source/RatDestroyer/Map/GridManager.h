@@ -22,6 +22,22 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneComponent;
 
+	struct FNode
+	{
+		FVector Position;
+		float gCost;
+		float hCost;
+		float fCost;
+		FNode* Parent;
+
+		FNode(FVector InPosition) : Position (InPosition), gCost(0), hCost(0), fCost(0), Parent(nullptr) {}
+
+		void CalculateFCost() { fCost = gCost + hCost; }
+	};
+
+
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,6 +62,31 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
 	TArray<ATile*> TileArray;
 
+	UPROPERTY()
+	TSet<FVector> BlockedTiles;
+
+
+	UFUNCTION()
+	bool IsTileBlocked(const FVector& TilePosition);
+
+	UFUNCTION()
+	bool IsWithinGrid(const FVector& Position) const;
+		
 	UFUNCTION()
 	ATile* GetTileLocation(FVector Location);
+
+	UFUNCTION()
+	TArray<FVector>FindPath(const FVector& StartPos, const FVector& GoalPos);
+	
+	UFUNCTION()
+	TArray<FNode*>GetNeighbors(FNode* Node);
+
+	
+	UFUNCTION()
+	float CalculateHeuristic(const FVector& Start, const FVector& Goal);
+
+	/*UFUNCTION()
+	void SpawnEnemy();*/
+
+
 };
