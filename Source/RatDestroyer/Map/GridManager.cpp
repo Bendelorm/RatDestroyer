@@ -4,6 +4,7 @@
 
 #include "GridManager.h"
 #include "Tile.h"
+#include "Node.h"
 
 
 
@@ -163,7 +164,7 @@ TArray<FVector> AGridManager::FindPath(const FVector& StartPos, const FVector& G
 	return Path;
 }
 
-TArray<FNode*>AGridManager::GetNeighbors(FNode* Node)
+TArray<FNode*>AGridManager::GetNeighbors(FNode* Node) const
 {
 	
 	TArray<FNode*> Neighbors;

@@ -7,21 +7,21 @@
 #include "Components/SceneComponent.h"
 #include "GridManager.generated.h"
 
-struct FNode
-	{
-		FVector Position;
-		float gCost;
-		float hCost;
-		float fCost;
-		FNode* Parent;
-
-		FNode(FVector InPosition) : Position (InPosition), gCost(0), hCost(0), fCost(0), Parent(nullptr) {}
-
-		void CalculateFCost() { fCost = gCost + hCost; }
-	};
+//struct FNode
+//	{
+//		FVector Position;
+//		float gCost;
+//		float hCost;
+//		float fCost;
+//		FNode* Parent;
+//
+//		FNode(FVector InPosition) : Position (InPosition), gCost(0), hCost(0), fCost(0), Parent(nullptr) {}
+//
+//		void CalculateFCost() { fCost = gCost + hCost; }
+//	};
 
 class ATile;
-
+struct FNode;
 
 
 UCLASS()
@@ -79,7 +79,7 @@ public:
 	TArray<FVector>FindPath(const FVector& StartPos, const FVector& GoalPos);
 	
 	UFUNCTION()
-	TArray<FNode*>GetNeighbors(FNode* Node);
+	TArray<FNode*>GetNeighbors(FNode* Node) const;
 
 	
 	UFUNCTION()
