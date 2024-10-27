@@ -163,7 +163,7 @@ TArray<FVector> AGridManager::FindPath(const FVector& StartPos, const FVector& G
 	return Path;
 }
 
-TArray<AGridManager::FNode*>AGridManager::GetNeighbors(FNode* Node)
+TArray<FNode*>AGridManager::GetNeighbors(FNode* Node)
 {
 	
 	TArray<FNode*> Neighbors;

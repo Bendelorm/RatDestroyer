@@ -7,8 +7,22 @@
 #include "Components/SceneComponent.h"
 #include "GridManager.generated.h"
 
+struct FNode
+	{
+		FVector Position;
+		float gCost;
+		float hCost;
+		float fCost;
+		FNode* Parent;
+
+		FNode(FVector InPosition) : Position (InPosition), gCost(0), hCost(0), fCost(0), Parent(nullptr) {}
+
+		void CalculateFCost() { fCost = gCost + hCost; }
+	};
 
 class ATile;
+
+
 
 UCLASS()
 class RATDESTROYER_API AGridManager : public AActor
@@ -22,19 +36,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneComponent;
 
-	struct FNode
-	{
-		FVector Position;
-		float gCost;
-		float hCost;
-		float fCost;
-		FNode* Parent;
-
-		FNode(FVector InPosition) : Position (InPosition), gCost(0), hCost(0), fCost(0), Parent(nullptr) {}
-
-		void CalculateFCost() { fCost = gCost + hCost; }
-	};
-
+	
 
 protected:
 	// Called when the game starts or when spawned
