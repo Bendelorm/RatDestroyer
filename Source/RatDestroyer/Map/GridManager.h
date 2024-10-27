@@ -73,8 +73,8 @@ public:
 	UFUNCTION()
 	float CalculateHeuristic(const FVector& Start, const FVector& Goal);
 
-	/*UFUNCTION()
-	void SpawnEnemy();*/
+	UFUNCTION()
+	void SpawnEnemy();
 
 	//Function
 	TArray<FNode*>GetNeighbors(FNode* Node);

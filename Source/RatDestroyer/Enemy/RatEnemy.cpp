@@ -14,6 +14,7 @@ ARatEnemy::ARatEnemy()
 	Health = 10;
 	bIsMoving = false;
 	
+	
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }
 
@@ -30,10 +31,6 @@ void ARatEnemy::Tick(float DeltaTime)
  {
 	Super::Tick(DeltaTime);
 
-	if(isAlive)
-	{
-		MoveToNextNode();
-	}
 
  }
 
@@ -50,15 +47,42 @@ bool ARatEnemy::AttackEnemy(float DamageTaken)
 	return isAlive;
 }
 
-void ARatEnemy::SpawnEnemy()
-{
-	this->isAlive = true;
-	//Må add inn her om pathfinding
-}
 
-void ARatEnemy::MoveToNextNode()
+void ARatEnemy::SetPath(const TArray<FVector>& NewPath)
 {
 	
+	Path = NewPath;
+	CurrentPathIndex = 0;
 }
+
+
+void ARatEnemy::MoveAlongPath(float DeltaTime)
+{
+
+	if (Path.Num() == 0 || CurrentPathIndex >= Path.Num())
+		return;
+
+	FVector CurrentPosition = GetActorLocation();
+	FVector TargetPosition = Path[CurrentPathIndex];
+
+
+	//Move towards waypoint
+
+	FVector Direction = (TargetPosition - CurrentPosition).GetSafeNormal();
+	FVector NewPosition = CurrentPosition + Direction * MovementSpeed * DeltaTime;
+	SetActorLocation(NewPosition);
+
+		//If close enough to the target, move to the next point
+	if (FVector::Dist(NewPosition, TargetPosition) < 10.f)
+			{
+				CurrentPathIndex;
+			}
+	
+
+}
+
+
+
+
 
 

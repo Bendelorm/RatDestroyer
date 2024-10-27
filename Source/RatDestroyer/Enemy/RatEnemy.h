@@ -30,6 +30,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> OverlapSphere;
 	
+	
+
 protected:
 	// Variables
 
@@ -48,12 +50,17 @@ protected:
 public:
 	virtual bool AttackEnemy(float DamageTaken);
 
-	void SpawnEnemy();
+	void MoveAlongPath(float DeltaTime);
 
-	//DistanceToNextNode() const;
-
-	void MoveToNextNode();
+	void SetPath(const TArray<FVector>& NewPath);
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
+	TSubclassOf<ARatEnemy> EnemyClass;
+
+
+	private:
+		int32 CurrentPathIndex;
+		TArray<FVector> Path;
 
 	
 };

@@ -4,7 +4,7 @@
 
 #include "GridManager.h"
 #include "Tile.h"
-
+#include "RatDestroyer/Enemy/RatEnemy.h"
 
 
 
@@ -195,18 +195,21 @@ float AGridManager::CalculateHeuristic(const FVector& Start, const FVector& Goal
 	return FMath::Abs(Start.X - Goal.X) + FMath::Abs(Start.Y - Goal.Y);
 }
 
-//void AGridManager::SpawnEnemy()
-//{
-//	FVector SpawnLocation;
-//	ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyClass, SpawnLocation, FRotator::ZeroRotator);
-//
-//	FVector GoalLocation;
-//	TArray<FVector> Path = FindPath(SpawnLocation, GoalLocation);
-//
-//		if (NewEnemy)
-//			{
-//			NewEnemy->SetPath(Path);
-//			}
-//
-//}
+void AGridManager::SpawnEnemy()
+{
+	FVector SpawnLocation = FVector(0.0f, 0.0f, 50.0f);;
+	FVector GoalLocation =	FVector(1000.0f, 1000.0f, 50.0f); 
+
+
+	ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(SpawnLocation, FRotator::ZeroRotator);
+
+	
+	TArray<FVector> Path = FindPath(SpawnLocation, GoalLocation);
+
+		if (NewEnemy)
+			{
+			NewEnemy->SetPath(Path);
+			}
+
+}
 
