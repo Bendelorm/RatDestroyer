@@ -62,11 +62,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
 	TArray<ATile*> TileArray;
 
-	UPROPERTY()
-	TSet<FVector> BlockedTiles;
+	/*UPROPERTY()
+	TSet<FVector> BlockedTiles;*/
 
 
-	UFUNCTION()
+	/*UFUNCTION()
 	bool IsTileBlocked(const FVector& TilePosition);
 
 	UFUNCTION()
@@ -83,7 +83,7 @@ public:
 
 	
 	UFUNCTION()
-	float CalculateHeuristic(const FVector& Start, const FVector& Goal);
+	float CalculateHeuristic(const FVector& Start, const FVector& Goal);*/
 
 	/*UFUNCTION()
 	void SpawnEnemy();*/
