@@ -5,23 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SceneComponent.h"
+#include "Node.h"
 #include "GridManager.generated.h"
 
-//struct FNode
-//	{
-//		FVector Position;
-//		float gCost;
-//		float hCost;
-//		float fCost;
-//		FNode* Parent;
-//
-//		FNode(FVector InPosition) : Position (InPosition), gCost(0), hCost(0), fCost(0), Parent(nullptr) {}
-//
-//		void CalculateFCost() { fCost = gCost + hCost; }
-//	};
+
 
 class ATile;
-struct FNode;
 
 
 UCLASS()
@@ -62,11 +51,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
 	TArray<ATile*> TileArray;
 
-	/*UPROPERTY()
-	TSet<FVector> BlockedTiles;*/
+	UPROPERTY()
+	TSet<FVector> BlockedTiles;
 
 
-	/*UFUNCTION()
+	UFUNCTION()
 	bool IsTileBlocked(const FVector& TilePosition);
 
 	UFUNCTION()
@@ -78,15 +67,16 @@ public:
 	UFUNCTION()
 	TArray<FVector>FindPath(const FVector& StartPos, const FVector& GoalPos);
 	
-	UFUNCTION()
-	TArray<FNode*>GetNeighbors(FNode* Node) const;
+	
 
 	
 	UFUNCTION()
-	float CalculateHeuristic(const FVector& Start, const FVector& Goal);*/
+	float CalculateHeuristic(const FVector& Start, const FVector& Goal);
 
 	/*UFUNCTION()
 	void SpawnEnemy();*/
 
+	//Function
+	TArray<FNode*>GetNeighbors(FNode* Node);
 		
 };
