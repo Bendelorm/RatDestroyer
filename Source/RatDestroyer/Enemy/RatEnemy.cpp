@@ -25,14 +25,20 @@ void ARatEnemy::BeginPlay()
 	
 }
 
+// Called every frame
+//void ARatEnemy::Tick(float DeltaTime)
+//{
+//	Super::Tick(DeltaTime);
+//	
+//}
 
-// Called every frame put in code for pathfinding for enemy
 void ARatEnemy::Tick(float DeltaTime)
- {
+{
 	Super::Tick(DeltaTime);
+	MoveAlongPath(DeltaTime); // Call your movement logic here
+}
 
 
- }
 
 //Function to reduce RatEnemy Health  by the damage number and check if Rat Enemy is still alive
 bool ARatEnemy::AttackEnemy(float DamageTaken)
@@ -58,26 +64,24 @@ void ARatEnemy::SetPath(const TArray<FVector>& NewPath)
 
 void ARatEnemy::MoveAlongPath(float DeltaTime)
 {
-
-	if (Path.Num() == 0 || CurrentPathIndex >= Path.Num())
-		return;
-
-	FVector CurrentPosition = GetActorLocation();
-	FVector TargetPosition = Path[CurrentPathIndex];
-
-
-	//Move towards waypoint
-
-	FVector Direction = (TargetPosition - CurrentPosition).GetSafeNormal();
-	FVector NewPosition = CurrentPosition + Direction * MovementSpeed * DeltaTime;
-	SetActorLocation(NewPosition);
-
-		//If close enough to the target, move to the next point
-	if (FVector::Dist(NewPosition, TargetPosition) < 10.f)
-			{
-				CurrentPathIndex;
-			}
 	
+	Super::Tick(DeltaTime);
+
+	if (Path.Num() > 0)
+	{
+		FVector NextWaypoint = Path[0];
+		FVector Direction = (NextWaypoint - GetActorLocation()).GetSafeNormal();
+		FVector NewLocation = GetActorLocation() + Direction * MovementSpeed * DeltaTime;
+		const float AcceptableDistance = 20.0f;
+
+		SetActorLocation(NewLocation);
+
+		// Check if we've reached the next waypoint
+		if (FVector::Dist(NewLocation, NextWaypoint) < AcceptableDistance)
+		{
+			Path.RemoveAt(0); // Remove the reached waypoint
+		}
+	}
 
 }
 

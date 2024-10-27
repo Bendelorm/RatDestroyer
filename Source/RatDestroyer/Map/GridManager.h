@@ -11,6 +11,8 @@
 
 
 class ATile;
+class ARatEnemy;
+
 
 
 UCLASS()
@@ -47,6 +49,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	TSubclassOf<ATile> TileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
+	TSubclassOf<ARatEnemy> EnemyClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
 	TArray<ATile*> TileArray;

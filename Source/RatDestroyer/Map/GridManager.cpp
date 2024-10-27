@@ -26,6 +26,9 @@ AGridManager::AGridManager()
 		SceneComponent->SetupAttachment(RootComponent);
 	}
 
+
+	
+
 }
 
 // Called when the game starts or when spawned
@@ -58,7 +61,7 @@ void AGridManager::BeginPlay()
 		}
 	}
 
-
+	
 
 }
 
@@ -197,19 +200,28 @@ float AGridManager::CalculateHeuristic(const FVector& Start, const FVector& Goal
 
 void AGridManager::SpawnEnemy()
 {
-	FVector SpawnLocation = FVector(0.0f, 0.0f, 50.0f);;
-	FVector GoalLocation =	FVector(1000.0f, 1000.0f, 50.0f); 
+	// Check if the TileArray has enough elements
+	if (TileArray.Num() > 0)
+	{
+		// Use the position of the first tile to spawn the enemy
+		FVector SpawnLocation = TileArray[0]->GetActorLocation(); // Get the location of the tile at index [0]
+		FVector GoalLocation = TileArray[99]->GetActorLocation(); // Get the goal location from the tile at index [99]
 
+		// Debug output
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Spawn Location: %s"), *SpawnLocation.ToString());
 
-	ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(SpawnLocation, FRotator::ZeroRotator);
-
-	
-	TArray<FVector> Path = FindPath(SpawnLocation, GoalLocation);
+		ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyClass, SpawnLocation, FRotator::ZeroRotator);
 
 		if (NewEnemy)
-			{
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Enemy spawned successfully at: %s"), *SpawnLocation.ToString());
+			TArray<FVector> Path = FindPath(SpawnLocation, GoalLocation);
 			NewEnemy->SetPath(Path);
-			}
-
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to spawn enemy at: %s"), *SpawnLocation.ToString());
+		}
+	}
 }
 

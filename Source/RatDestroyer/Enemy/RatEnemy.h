@@ -25,7 +25,7 @@ protected:
 
 public:
 	
-	virtual void Tick(float deltatime) override;
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> OverlapSphere;
