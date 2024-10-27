@@ -3,6 +3,9 @@
 
 #include "Tile.h"
 
+#include "Kismet/GameplayStatics.h"
+#include "Ratdestroyer/Player/PlayerPawn.h"
+
 // Sets default values
 ATile::ATile()
 {
@@ -29,13 +32,14 @@ ATile::ATile()
 
 void ATile::ChangeMatOnMouseOver(UPrimitiveComponent* TouchedComponent)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Moused over lol")));
-	TileMeshComponent->SetMaterial(0, MaterialTwo);
+	if (PlayerPawn->bCanBuild)
+	{
+		TileMeshComponent->SetMaterial(0, MaterialTwo);
+	}
 }
 
 void ATile::EndMatOnMouseOver(UPrimitiveComponent* TouchedComponent)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Stopped mousing over lol")));
 	TileMeshComponent->SetMaterial(0, MaterialOne);
 }
 
@@ -59,6 +63,8 @@ void ATile::BeginPlay()
 {
 	Super::BeginPlay();
 	TileMeshComponent->SetMaterial(0, MaterialOne);
+	PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawn::StaticClass()));
+
 }
 
 // Called every frame

@@ -9,6 +9,8 @@
 #include "DrawDebugHelpers.h"
 #include "Tile.generated.h"
 
+class APlayerPawn;
+
 UCLASS()
 class RATDESTROYER_API ATile : public AActor
 {
@@ -17,6 +19,8 @@ class RATDESTROYER_API ATile : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ATile();
+
+	APlayerPawn* PlayerPawn;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UStaticMeshComponent* TileMeshComponent;
@@ -35,6 +39,9 @@ public:
 
 	UPROPERTY()
 	bool bHasTower;
+
+	UPROPERTY()
+	bool bShowMat;
 
 
 protected:

@@ -13,15 +13,9 @@ ARDTowerActor::ARDTowerActor()
 	TowerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	RootComponent = TowerMeshComponent;
 
-	HighlightComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HighlightComponent"));
-	HighlightComponent->SetupAttachment(TowerMeshComponent);
-
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("UBoxComponent"));
 	BoxComponent->SetupAttachment(TowerMeshComponent);
-
-
 }
-
 
 // Called when the game starts or when spawned
 void ARDTowerActor::BeginPlay()

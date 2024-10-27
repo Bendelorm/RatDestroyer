@@ -32,8 +32,6 @@ public:
 
 	TObjectPtr<ATile> SelectedTile;
 
-	TObjectPtr<ARDTowerActor> TheTowerActor;
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -96,21 +94,35 @@ public:
 	UInputAction* BuildModeAction;
 
 	//Functions
+
+	UFUNCTION()
 	void MoveTriggered(const FInputActionValue& Value);
 
+	UFUNCTION()
 	void MoveCompleted();
 
+	UFUNCTION()
 	void Zoom(const FInputActionValue& Value);
 
+	UFUNCTION()
 	void RotationStarted();
 
+	UFUNCTION()
 	void RotationCompleted();
 
+	UFUNCTION()
 	void Look(const FInputActionValue& Value);
 
+	UFUNCTION()
 	void Select(const FInputActionValue& Value);
 
+	UFUNCTION()
 	void BuildMode(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void BuildTower(ATile* TargetTile);
+
+
 
 protected:
 	// Called when the game starts or when spawned

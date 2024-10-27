@@ -98,8 +98,7 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 					if (TileInArray == ClickedTile)
 					{
 						SelectedTile = TileInArray;
-						FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-						TheTowerActor->AttachToComponent(SelectedTile->GetStaticMesh(), AttachmentRules, FName(TEXT("TowerSocket")));
+						BuildTower(SelectedTile);
 					}
 				}
 			}
@@ -131,6 +130,24 @@ void APlayerPawn::BuildMode(const FInputActionValue& Value)
 
 	}
 }
+
+void APlayerPawn::BuildTower(ATile* TargetTile)
+{
+	SelectedTile = TargetTile;
+	AActor* SelectedTower = GetWorld()->SpawnActor(BaseTower);
+	if (SelectedTower == nullptr || SelectedTile == nullptr || SelectedTile->GetHasTower())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("returning")));
+
+		return;
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("placing tower")));
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+	SelectedTower->AttachToComponent(SelectedTile->GetStaticMesh(), AttachmentRules, FName(TEXT("TowerSocket")));
+	SelectedTile->SetHasTower(true);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Placed Tower")));
+}
+
 
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
