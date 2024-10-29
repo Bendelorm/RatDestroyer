@@ -31,11 +31,17 @@ AGridManager::AGridManager()
 
 }
 
+
+
+
+
 // Called when the game starts or when spawned
 void AGridManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	
+
 	for (int32 X = 0; X < GridSizeX; ++X)
 	{
 		for (int32 Y = 0; Y < GridSizeY; ++Y)
@@ -61,7 +67,7 @@ void AGridManager::BeginPlay()
 		}
 	}
 
-	
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AGridManager::SpawnEnemy, SpawnInterval, true);
 
 }
 
@@ -100,34 +106,33 @@ ATile* AGridManager::GetTileLocation(FVector Location)
 	return nullptr;
 }
 
-TArray<FVector> AGridManager::FindPath(const FVector& StartPos, const FVector& GoalPos)
+TArray<ATile*> AGridManager::FindPath(ATile* StartTile, ATile* GoalTile)
 {
-	TArray<FNode*> OpenSet; //number of nodes to evaluate
-	TArray<FNode*> ClosedSet; //nodes that have been evaluated
-	TArray<FVector> Path; //path to return
+	TArray<FNode*> OpenSet;   // Tiles to evaluate
+	TArray<FNode*> ClosedSet; // Tiles already evaluated
+	TArray<ATile*> Path;      // The path to return
 
-	FNode* StartNode = new FNode(StartPos);
-	FNode* GoalNode = new FNode(GoalPos);
+	FNode* StartNode = new FNode(StartTile);
+	FNode* GoalNode = new FNode(GoalTile);
 
 	OpenSet.Add(StartNode);
 
 	while (OpenSet.Num() > 0)
 	{
-		OpenSet.Sort([](const FNode& A, const FNode& B) {return A.fCost < B.fCost; });
+		OpenSet.Sort([](const FNode& A, const FNode& B) { return A.fCost < B.fCost; });
 		FNode* CurrentNode = OpenSet[0];
 
-		if (CurrentNode->Position == GoalNode->Position)
+		if (CurrentNode->Tile == GoalNode->Tile)
 		{
-			//path found
+			// Reconstruct path
 			FNode* Node = CurrentNode;
 			while (Node)
 			{
-				Path.Insert(Node->Position, 0);
+				Path.Insert(Node->Tile, 0); // Insert each tile at the start of the path
 				Node = Node->Parent;
 			}
 			break;
 		}
-
 
 		OpenSet.Remove(CurrentNode);
 		ClosedSet.Add(CurrentNode);
@@ -136,14 +141,14 @@ TArray<FVector> AGridManager::FindPath(const FVector& StartPos, const FVector& G
 
 		for (FNode* Neighbor : Neighbors)
 		{
-			if (IsTileBlocked(Neighbor->Position) || ClosedSet.Contains(Neighbor))
+			if (IsTileBlocked(Neighbor->Tile->GetActorLocation()) || ClosedSet.Contains(Neighbor))
 				continue;
 
-			float NewMovementCost = CurrentNode->gCost + CalculateHeuristic(CurrentNode->Position, Neighbor->Position);
+			float NewMovementCost = CurrentNode->gCost + CalculateHeuristic(CurrentNode->Tile, Neighbor->Tile);
 			if (NewMovementCost < Neighbor->gCost || !OpenSet.Contains(Neighbor))
 			{
 				Neighbor->gCost = NewMovementCost;
-				Neighbor->hCost = CalculateHeuristic(Neighbor->Position, GoalNode->Position);
+				Neighbor->hCost = CalculateHeuristic(Neighbor->Tile, GoalNode->Tile);
 				Neighbor->CalculateFCost();
 				Neighbor->Parent = CurrentNode;
 
@@ -151,77 +156,80 @@ TArray<FVector> AGridManager::FindPath(const FVector& StartPos, const FVector& G
 				{
 					OpenSet.Add(Neighbor);
 				}
-
 			}
-
 		}
-
 	}
 
-	//Cleaning up nodes
+	// Cleanup
 	for (FNode* Node : OpenSet) delete Node;
 	for (FNode* Node : ClosedSet) delete Node;
-
-
 
 	return Path;
 }
 
-TArray<FNode*>AGridManager::GetNeighbors(FNode* Node) 
+TArray<FNode*> AGridManager::GetNeighbors(FNode* Node)
 {
-	
 	TArray<FNode*> Neighbors;
+	int32 Index = TileArray.IndexOfByKey(Node->Tile);
 
-	TArray<FVector> NeighborPos =
+	if (Index != INDEX_NONE)
 	{
-
-		FVector(Node->Position.X + TileSize, Node->Position.Y, 0),
-		FVector(Node->Position.X - TileSize, Node->Position.Y, 0),
-		FVector(Node->Position.X, Node->Position.Y + TileSize, 0),
-		FVector(Node->Position.X, Node->Position.Y - TileSize, 0)
-
-	};
-
-	for (const FVector& Position : NeighborPos)
-	{
-		if (IsWithinGrid(Position))
-		{
-			Neighbors.Add(new FNode(Position));
-		}
+		// Retrieve adjacent tiles by index
+		if (Index - GridSizeX >= 0) Neighbors.Add(new FNode(TileArray[Index - GridSizeX])); // Up
+		if (Index + GridSizeX < TileArray.Num()) Neighbors.Add(new FNode(TileArray[Index + GridSizeX])); // Down
+		if (Index % GridSizeX > 0) Neighbors.Add(new FNode(TileArray[Index - 1])); // Left
+		if ((Index + 1) % GridSizeX > 0) Neighbors.Add(new FNode(TileArray[Index + 1])); // Right
 	}
 
 	return Neighbors;
 }
 
-float AGridManager::CalculateHeuristic(const FVector& Start, const FVector& Goal)
+float AGridManager::CalculateHeuristic(ATile* StartTile, ATile* GoalTile)
 {
-	return FMath::Abs(Start.X - Goal.X) + FMath::Abs(Start.Y - Goal.Y);
+	FVector StartLocation = StartTile->GetActorLocation();
+	FVector GoalLocation = GoalTile->GetActorLocation();
+	return FMath::Abs(StartLocation.X - GoalLocation.X) + FMath::Abs(StartLocation.Y - GoalLocation.Y);
 }
 
 void AGridManager::SpawnEnemy()
 {
-	// Check if the TileArray has enough elements
-	if (TileArray.Num() > 0)
-	{
-		// Use the position of the first tile to spawn the enemy
-		FVector SpawnLocation = TileArray[0]->GetActorLocation(); // Get the location of the tile at index [0]
-		FVector GoalLocation = TileArray[99]->GetActorLocation(); // Get the goal location from the tile at index [99]
+	
 
-		// Debug output
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Spawn Location: %s"), *SpawnLocation.ToString());
+	if (TileArray.Num() > 1)
+	{
+		ATile* StartTile = TileArray[0];
+		ATile* GoalTile = TileArray[TileArray.Num() - 1];
+
+		FVector SpawnLocation = StartTile->GetActorLocation() + FVector(0, 0, 100.f);
 
 		ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyClass, SpawnLocation, FRotator::ZeroRotator);
 
 		if (NewEnemy)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Enemy spawned successfully at: %s"), *SpawnLocation.ToString());
-			TArray<FVector> Path = FindPath(SpawnLocation, GoalLocation);
-			NewEnemy->SetPath(Path);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to spawn enemy at: %s"), *SpawnLocation.ToString());
+			// Use `FindPath` with `ATile*` parameters
+			TArray<ATile*> Path = FindPath(StartTile, GoalTile);
+
+			// Pass tile locations to the enemy's path as FVectors
+			TArray<FVector> PathLocations;
+			for (ATile* Tile : Path)
+			{
+				PathLocations.Add(Tile->GetActorLocation());
+			}
+
+			if (PathLocations.Num() > 0)
+			{
+				NewEnemy->SetPath(PathLocations);
+				UE_LOG(LogTemp, Warning, TEXT("Enemy spawned and path set with %d locations."), PathLocations.Num());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Failed to find a path from %s to %s"), *SpawnLocation.ToString(), *GoalTile->GetActorLocation().ToString());
+				// Optionally, destroy the enemy here if the path is invalid
+				NewEnemy->Destroy();
+			}
 		}
 	}
 }
+
+
 

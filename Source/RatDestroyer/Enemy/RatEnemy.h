@@ -50,7 +50,7 @@ protected:
 public:
 	virtual bool AttackEnemy(float DamageTaken);
 
-	void MoveAlongPath(float DeltaTime);
+	void MoveAlongPath();
 
 	void SetPath(const TArray<FVector>& NewPath);
 	

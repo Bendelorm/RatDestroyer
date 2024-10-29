@@ -62,30 +62,47 @@ void ARatEnemy::SetPath(const TArray<FVector>& NewPath)
 }
 
 
-void ARatEnemy::MoveAlongPath(float DeltaTime)
+void ARatEnemy::MoveAlongPath()
 {
-	
-	Super::Tick(DeltaTime);
+    float AcceptableDistance = 50.f;
 
-	if (Path.Num() > 0)
-	{
-		FVector NextWaypoint = Path[0];
-		FVector Direction = (NextWaypoint - GetActorLocation()).GetSafeNormal();
-		FVector NewLocation = GetActorLocation() + Direction * MovementSpeed * DeltaTime;
-		const float AcceptableDistance = 20.0f;
+    // Check if the path is empty
+    if (Path.Num() == 0)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Path is empty, cannot move."));
+        return; // Avoid processing if there's no path
+    }
 
-		SetActorLocation(NewLocation);
+    // Check if CurrentPathIndex is out of bounds
+    if (CurrentPathIndex >= Path.Num())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("CurrentPathIndex is out of bounds!"));
+        return; // Prevent accessing out of bounds
+    }
 
-		// Check if we've reached the next waypoint
-		if (FVector::Dist(NewLocation, NextWaypoint) < AcceptableDistance)
-		{
-			Path.RemoveAt(0); // Remove the reached waypoint
-		}
-	}
+    FVector TargetLocation = Path[CurrentPathIndex];
 
+    // Move towards the target location
+    // Simple linear interpolation for movement
+    FVector CurrentLocation = GetActorLocation();
+    FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
+
+    // Move the enemy towards the target location
+    SetActorLocation(CurrentLocation + Direction * MovementSpeed * GetWorld()->DeltaTimeSeconds); // MoveSpeed should be defined in your class
+
+    // Check if reached the target location
+    if (FVector::Dist(CurrentLocation, TargetLocation) < AcceptableDistance) // Check if close enough to the target
+    {
+        CurrentPathIndex++; // Move to the next target
+
+        // Check if reached the end of the path
+        if (CurrentPathIndex >= Path.Num())
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Reached the end of the path."));
+            Destroy(); // Destroy or handle the enemy reaching the goal
+        }
+    }
 }
-
-
 
 
 

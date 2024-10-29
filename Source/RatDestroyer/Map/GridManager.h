@@ -69,19 +69,29 @@ public:
 	UFUNCTION()
 	ATile* GetTileLocation(FVector Location);
 
-	UFUNCTION()
-	TArray<FVector>FindPath(const FVector& StartPos, const FVector& GoalPos);
-	
-	
 
+
+
+
+	// the code below should be moved //
+
+	UFUNCTION()
+	TArray<ATile*>FindPath(ATile* StartTile, ATile* GoalTile);
+	
 	
 	UFUNCTION()
-	float CalculateHeuristic(const FVector& Start, const FVector& Goal);
+	float CalculateHeuristic(ATile* StartTile, ATile* GoalTile);
 
 	UFUNCTION()
 	void SpawnEnemy();
 
-	//Function
 	TArray<FNode*>GetNeighbors(FNode* Node);
 		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	float SpawnInterval = 5.0f; 
+
+	FTimerHandle SpawnTimerHandle;
+
+	// the code above should be moved //
+
 };
