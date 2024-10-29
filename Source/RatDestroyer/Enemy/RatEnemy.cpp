@@ -35,7 +35,7 @@ void ARatEnemy::BeginPlay()
 void ARatEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MoveAlongPath(DeltaTime); // Call your movement logic here
+	MoveAlongPath(); // Call your movement logic here
 }
 
 
