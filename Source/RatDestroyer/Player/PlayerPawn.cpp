@@ -15,6 +15,7 @@
 #include "RatDestroyer/Tower/RDTowerActor.h"
 #include "RatDestroyer/Map/GridManager.h"
 #include "RatDestroyer/Map/Tile.h"
+#include "RatDestroyer/Tower/RDTowerManager.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -81,6 +82,7 @@ void APlayerPawn::Look(const FInputActionValue& Value)
 	}
 }
 
+//Either selects an object or builds tower
 void APlayerPawn::Select(const FInputActionValue& Value)
 {
 	FHitResult HitResult;
@@ -130,22 +132,26 @@ void APlayerPawn::BuildMode(const FInputActionValue& Value)
 
 	}
 }
-
+//Called when trying to build a tower on a tile
 void APlayerPawn::BuildTower(ATile* TargetTile)
 {
 	SelectedTile = TargetTile;
 	AActor* SelectedTower = GetWorld()->SpawnActor(BaseTower);
 	if (SelectedTower == nullptr || SelectedTile == nullptr || SelectedTile->GetHasTower())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("returning")));
-
 		return;
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("placing tower")));
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	SelectedTower->AttachToComponent(SelectedTile->GetStaticMesh(), AttachmentRules, FName(TEXT("TowerSocket")));
+	TowerManager->Push(SelectedTower);
 	SelectedTile->SetHasTower(true);
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Placed Tower")));
+
+}
+
+void APlayerPawn::UndoTower(const FInputActionValue& Value)
+{
+	TowerManager->Pop();
 }
 
 
@@ -161,6 +167,7 @@ void APlayerPawn::BeginPlay()
 		PlayerController->bEnableMouseOverEvents = true;
 		PlayerController->bEnableClickEvents = true;
 		GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+		TowerManager = Cast<ARDTowerManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ARDTowerManager::StaticClass()));
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(IMC, 0);
@@ -230,7 +237,10 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 		//Select with mouse
 		EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Triggered, this, &APlayerPawn::Select);
-
 		EnhancedInputComponent->BindAction(BuildModeAction, ETriggerEvent::Triggered, this, &APlayerPawn::BuildMode);
+
+		//Undo tower
+		EnhancedInputComponent->BindAction(UndoTowerAction, ETriggerEvent::Triggered, this, &APlayerPawn::UndoTower);
+
 	}
 }

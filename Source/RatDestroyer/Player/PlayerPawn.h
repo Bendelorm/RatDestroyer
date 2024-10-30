@@ -8,8 +8,6 @@
 #include "PlayerPawn.generated.h"
 
 
-
-
 struct FInputActionValue;
 class UCameraComponent;
 class UInputComponent;
@@ -18,6 +16,7 @@ class UInputMappingContext;
 class ARDTowerActor;
 class ATile;
 class AGridManager;
+class ARDTowerManager;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
@@ -31,6 +30,8 @@ public:
 	TObjectPtr<AGridManager> GridManager;
 
 	TObjectPtr<ATile> SelectedTile;
+
+	TObjectPtr<ARDTowerManager> TowerManager;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -93,6 +94,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* BuildModeAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* UndoTowerAction;
+
 	//Functions
 
 	UFUNCTION()
@@ -121,6 +125,9 @@ public:
 
 	UFUNCTION()
 	void BuildTower(ATile* TargetTile);
+
+	UFUNCTION()
+	void UndoTower(const FInputActionValue& Value);
 
 
 
