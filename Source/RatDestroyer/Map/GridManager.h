@@ -5,10 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SceneComponent.h"
+#include "Node.h"
 #include "GridManager.generated.h"
 
 
+
 class ATile;
+class ARatEnemy;
+
+
 
 UCLASS()
 class RATDESTROYER_API AGridManager : public AActor
@@ -21,6 +26,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneComponent;
+
+	
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,9 +50,48 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	TSubclassOf<ATile> TileClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
+	TSubclassOf<ARatEnemy> EnemyClass;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
 	TArray<ATile*> TileArray;
 
+	UPROPERTY()
+	TSet<FVector> BlockedTiles;
+
+
+	UFUNCTION()
+	bool IsTileBlocked(const FVector& TilePosition);
+
+	UFUNCTION()
+	bool IsWithinGrid(const FVector& Position) const;
+		
 	UFUNCTION()
 	ATile* GetTileLocation(FVector Location);
+
+
+
+
+
+	// the code below should be moved //
+
+	UFUNCTION()
+	TArray<ATile*>FindPath(ATile* StartTile, ATile* GoalTile);
+	
+	
+	UFUNCTION()
+	float CalculateHeuristic(ATile* StartTile, ATile* GoalTile);
+
+	UFUNCTION()
+	void SpawnEnemy();
+
+	TArray<FNode*>GetNeighbors(FNode* Node);
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	float SpawnInterval = 5.0f; 
+
+	FTimerHandle SpawnTimerHandle;
+
+	// the code above should be moved //
+
 };
