@@ -200,7 +200,7 @@ void AGridManager::SpawnEnemy()
 		ATile* StartTile = TileArray[0];
 		ATile* GoalTile = TileArray[TileArray.Num() - 1];
 
-		FVector SpawnLocation = StartTile->GetActorLocation() + FVector(0, 0, 100.f);
+		FVector SpawnLocation = StartTile->GetActorLocation() + FVector(0, 0, 200.f);
 
 		ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyClass, SpawnLocation, FRotator::ZeroRotator);
 
