@@ -86,22 +86,19 @@ void APlayerPawn::Look(const FInputActionValue& Value)
 void APlayerPawn::Select(const FInputActionValue& Value)
 {
 	FHitResult HitResult;
-	if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
+	if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult) && bCanBuild)
 	{
-		if (bCanBuild)
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("bCanBuild is active")));
+		if (BaseTower != nullptr && HitResult.GetActor()->ActorHasTag("Buildable"))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("bCanBuild is active")));
-			if (BaseTower != nullptr && HitResult.GetActor()->ActorHasTag("Buildable"))
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Base tower is not a nullptr and u clicked a tile")));
+			ATile* ClickedTile = Cast<ATile>(HitResult.GetActor());
+			for (ATile* TileInArray : GridManager->TileArray)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Base tower is not a nullptr and u clicked a tile")));
-				ATile* ClickedTile = Cast<ATile>(HitResult.GetActor());
-				for (ATile* TileInArray : GridManager->TileArray)
+				if (TileInArray == ClickedTile)
 				{
-					if (TileInArray == ClickedTile)
-					{
-						SelectedTile = TileInArray;
-						BuildTower(SelectedTile);
-					}
+					SelectedTile = TileInArray;
+					BuildTower(SelectedTile);
 				}
 			}
 		}
