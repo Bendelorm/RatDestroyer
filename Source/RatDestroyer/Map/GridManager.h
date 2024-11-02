@@ -49,10 +49,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	TSubclassOf<ATile> TileClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	TSubclassOf<ARatEnemy> EnemyClass;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
 	TArray<ATile*> TileArray;
 
@@ -71,8 +68,6 @@ public:
 
 
 
-
-
 	// the code below should be moved //
 
 	UFUNCTION()
@@ -81,17 +76,7 @@ public:
 	
 	UFUNCTION()
 	float CalculateHeuristic(ATile* StartTile, ATile* GoalTile);
-
-	UFUNCTION()
-	void SpawnEnemy();
-
+	
 	TArray<FNode*>GetNeighbors(FNode* Node);
-		
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
-	float SpawnInterval = 5.0f; 
-
-	FTimerHandle SpawnTimerHandle;
-
-	// the code above should be moved //
-
+	
 };

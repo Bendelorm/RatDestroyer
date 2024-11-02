@@ -8,6 +8,7 @@
 
 ARatEnemy::ARatEnemy()
 {
+	
  	// Set this character to call Tick() every frame. 
 	PrimaryActorTick.bCanEverTick = true;
 	MovementSpeed = 300.0f;
@@ -24,13 +25,6 @@ void ARatEnemy::BeginPlay()
 	Super::BeginPlay();
 	
 }
-
-// Called every frame
-//void ARatEnemy::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//	
-//}
 
 void ARatEnemy::Tick(float DeltaTime)
 {

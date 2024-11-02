@@ -4,7 +4,7 @@
 
 #include "GridManager.h"
 #include "Tile.h"
-#include "RatDestroyer/Enemy/RatEnemy.h"
+
 
 
 
@@ -25,15 +25,9 @@ AGridManager::AGridManager()
 	{
 		SceneComponent->SetupAttachment(RootComponent);
 	}
-
-
 	
 
 }
-
-
-
-
 
 // Called when the game starts or when spawned
 void AGridManager::BeginPlay()
@@ -66,9 +60,7 @@ void AGridManager::BeginPlay()
 
 		}
 	}
-
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AGridManager::SpawnEnemy, SpawnInterval, true);
-
+	
 }
 
 // Called every frame
@@ -191,45 +183,7 @@ float AGridManager::CalculateHeuristic(ATile* StartTile, ATile* GoalTile)
 	return FMath::Abs(StartLocation.X - GoalLocation.X) + FMath::Abs(StartLocation.Y - GoalLocation.Y);
 }
 
-void AGridManager::SpawnEnemy()
-{
-	
 
-	if (TileArray.Num() > 1)
-	{
-		ATile* StartTile = TileArray[0];
-		ATile* GoalTile = TileArray[TileArray.Num() - 1];
-
-		FVector SpawnLocation = StartTile->GetActorLocation() + FVector(0, 0, 200.f);
-
-		ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyClass, SpawnLocation, FRotator::ZeroRotator);
-
-		if (NewEnemy)
-		{
-			// Use `FindPath` with `ATile*` parameters
-			TArray<ATile*> Path = FindPath(StartTile, GoalTile);
-
-			// Pass tile locations to the enemy's path as FVectors
-			TArray<FVector> PathLocations;
-			for (ATile* Tile : Path)
-			{
-				PathLocations.Add(Tile->GetActorLocation());
-			}
-
-			if (PathLocations.Num() > 0)
-			{
-				NewEnemy->SetPath(PathLocations);
-				UE_LOG(LogTemp, Warning, TEXT("Enemy spawned and path set with %d locations."), PathLocations.Num());
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Failed to find a path from %s to %s"), *SpawnLocation.ToString(), *GoalTile->GetActorLocation().ToString());
-				// Optionally, destroy the enemy here if the path is invalid
-				NewEnemy->Destroy();
-			}
-		}
-	}
-}
 
 
 
