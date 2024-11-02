@@ -50,17 +50,14 @@ protected:
 public:
 	virtual bool AttackEnemy(float DamageTaken);
 
-	void MoveAlongPath();
-
-	void SetPath(const TArray<FVector>& NewPath);
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	TSubclassOf<ARatEnemy> EnemyClass;
 
 
 	private:
-		int32 CurrentPathIndex;
-		TArray<FVector> Path;
+		
 
 	
 };

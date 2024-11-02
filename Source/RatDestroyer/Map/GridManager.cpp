@@ -3,6 +3,7 @@
 
 
 #include "GridManager.h"
+#include "Node.h"
 #include "Tile.h"
 
 
@@ -34,7 +35,17 @@ void AGridManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	// A* 
+	OnUserCreate();
+	OnUserUpdate(0);
+
+	FTimerHandle T;
+	GetWorld()->GetTimerManager().SetTimer(T, [&]()
+		{
+			Solve_AStar();
+		}, 2.f, false);
+	// A*
+
 
 	for (int32 X = 0; X < GridSizeX; ++X)
 	{
@@ -70,120 +81,181 @@ void AGridManager::Tick(float DeltaTime)
 
 }
 
-bool AGridManager::IsTileBlocked(const FVector& TilePosition) 
+
+
+
+
+bool AGridManager::OnUserCreate()
 {
-	return BlockedTiles.Contains(TilePosition); //modify to work with our code
-}
-
-bool AGridManager::IsWithinGrid(const FVector& Position) const
-{
-	int32 X = Position.X / TileSize;
-	int32 Y = Position.Y / TileSize;
-
-	return X >= 0 && X < GridSizeX && Y >= 0 && Y < GridSizeY;
-}
-
-ATile* AGridManager::GetTileLocation(FVector Location)
-{
-
-	for (ATile* Tile : TileArray)
-	{
-		if (Tile && Tile->GetActorLocation().Equals(Location, 50.f))
+	for (int32 x = 0; x < nMapWidth; x++)
+		for (int32 y = 0; y < nMapHeight; y++)
 		{
-			return Tile;
+			int32 CurrentIndex = y * nMapHeight + x;
+			FNode Node;
+			Node.X = x;
+			Node.Y = y;
+
+			bool bRandomBool = (FMath::FRand() <= 0.2); //probability of being an obstacle
+
+			if (bRandomBool)
+				Node.bObstacle = true;
+
+			else
+			{
+				Node.bObstacle = false;
+			}
+
+
+			Node.bVisited = false;
+			Node.parent = nullptr;
+			Node.WorldLocation = FVector(x * 100, y * 100, 0); //set size of node
+			Nodes.Add(Node);
 		}
+
+	//when the nodes are stored in the array, get neighbors
+	for (int32 x = 0; x < nMapWidth; x++)
+		for (int32 y = 0; y < nMapHeight; y++)
+		{
+			int32 CurrentIndex = y * nMapHeight + x;
+			FNode* Node = &Nodes[CurrentIndex];
+			GetNeighbors(*Node);
+		}
+
+	NodeStart = &Nodes[1]; //assigning path nodes
+	NodeEnd = &Nodes[99];
+
+	DrawDebugBox(GetWorld(), NodeStart->WorldLocation, FVector(100, 100, 50), FColor::Blue, false, 200.f, 30.f);
+	DrawDebugBox(GetWorld(), NodeEnd->WorldLocation, FVector(100, 100, 50), FColor::Red, false, 200.f, 30.f);
+
+
+	return true;
+}
+
+bool AGridManager::OnUserUpdate(float DeltaTime)
+{
+
+	for (int32 x = 0; x < nMapWidth; x++)
+		for (int32 y = 0; y < nMapHeight; y++)
+		{
+			int32 CurIndexNode = y * nMapWidth + x;
+			FNode* CurrentNode = &Nodes[CurIndexNode];
+			FVector CenterOfNode = CurrentNode->WorldLocation;
+
+			if (CurrentNode->bObstacle)
+				DrawDebugBox(GetWorld(), CenterOfNode, FVector(100, 100, 50), FColor::Black, false, 200.f, 10.f);
+
+			else
+			{
+				DrawDebugBox(GetWorld(), CenterOfNode, FVector(100, 100, 50), FColor::White, false, 200.f, 10.f);
+			}
+
+			if (CurrentNode->bVisited)
+				DrawDebugBox(GetWorld(), CurrentNode->WorldLocation, FVector(100, 100, 50), FColor::Turquoise, false, 200.f, 16.f);
+
+
+		}
+
+
+	return true;
+}
+
+TArray<FNode> AGridManager::GetNeighbors(FNode& currentnode)
+{
+
+	TArray<FNode> Neighbors;
+	for (int32 i = 0; i < 4; i++)
+	{
+		int32 x = currentnode.X + relativeCoords[i][0];
+		int32 y = currentnode.Y + relativeCoords[i][1];
+
+		if (x >= 0 && x < nMapWidth && y >= 0 && y < nMapHeight)
+		{
+			int32 neighborIndex = x * nMapHeight + y;
+			FNode* Node = &Nodes[neighborIndex];
+			currentnode.Neighbors.Add(Node);
+		}
+
 	}
 
-
-	return nullptr;
+	return TArray<FNode>();
 }
 
-TArray<ATile*> AGridManager::FindPath(ATile* StartTile, ATile* GoalTile)
+void AGridManager::Solve_AStar()
 {
-	TArray<FNode*> OpenSet;   // Tiles to evaluate
-	TArray<FNode*> ClosedSet; // Tiles already evaluated
-	TArray<ATile*> Path;      // The path to return
 
-	FNode* StartNode = new FNode(StartTile);
-	FNode* GoalNode = new FNode(GoalTile);
-
-	OpenSet.Add(StartNode);
-
-	while (OpenSet.Num() > 0)
+	for (int32 i = 0; i < Nodes.Num(); i++)
 	{
-		OpenSet.Sort([](const FNode& A, const FNode& B) { return A.fCost < B.fCost; });
-		FNode* CurrentNode = OpenSet[0];
+		FNode* Node = &Nodes[i];
+		Node->bVisited = false;
+		Node->fGlobalGoal = 99000000; //infinite
+		Node->fLocalGoal = 99000000;  //infinite
+		Node->parent = nullptr;
 
-		if (CurrentNode->Tile == GoalNode->Tile)
+	}
+
+	auto distance = [](FNode* a, FNode* b)
 		{
-			// Reconstruct path
-			FNode* Node = CurrentNode;
-			while (Node)
-			{
-				Path.Insert(Node->Tile, 0); // Insert each tile at the start of the path
-				Node = Node->Parent;
-			}
+			return sqrt((a->X - b->X) * (a->X - b->X) + (a->Y - b->Y) * (a->Y - b->Y));
+		};
+
+	auto heuristic = [distance](FNode* a, FNode* b)
+		{
+			return distance(a, b);
+
+		};
+
+	FNode* nodeCurrent = NodeStart;
+	NodeStart->fLocalGoal = 0.f;
+	NodeStart->fGlobalGoal = heuristic(NodeStart, NodeEnd);
+
+	TArray<FNode*> ListNotTestedNodes;
+	ListNotTestedNodes.Add(NodeStart); //start search by pushing first node to the array
+
+	while (ListNotTestedNodes.Num() > 0 && nodeCurrent != NodeEnd)
+	{
+		//sorts untested nodes by the globalgoal, lowest is first
+		ListNotTestedNodes.Sort([](const FNode& lhs, const FNode& rhs) {return lhs.fGlobalGoal < rhs.fGlobalGoal; });
+
+		while (ListNotTestedNodes.Num() > 0 && ListNotTestedNodes[0]->bVisited)
+			ListNotTestedNodes.RemoveAt(0);
+
+		if (ListNotTestedNodes.Num() == 0)
 			break;
-		}
 
-		OpenSet.Remove(CurrentNode);
-		ClosedSet.Add(CurrentNode);
+		nodeCurrent = ListNotTestedNodes[0];
+		nodeCurrent->bVisited = true; //we only visit a node once 
 
-		TArray<FNode*> Neighbors = GetNeighbors(CurrentNode);
-
-		for (FNode* Neighbor : Neighbors)
+		for (auto nodeNeighbor : nodeCurrent->Neighbors)
 		{
-			if (IsTileBlocked(Neighbor->Tile->GetActorLocation()) || ClosedSet.Contains(Neighbor))
-				continue;
 
-			float NewMovementCost = CurrentNode->gCost + CalculateHeuristic(CurrentNode->Tile, Neighbor->Tile);
-			if (NewMovementCost < Neighbor->gCost || !OpenSet.Contains(Neighbor))
+			if (!nodeNeighbor->bVisited && nodeNeighbor->bObstacle == 0)
 			{
-				Neighbor->gCost = NewMovementCost;
-				Neighbor->hCost = CalculateHeuristic(Neighbor->Tile, GoalNode->Tile);
-				Neighbor->CalculateFCost();
-				Neighbor->Parent = CurrentNode;
-
-				if (!OpenSet.Contains(Neighbor))
-				{
-					OpenSet.Add(Neighbor);
-				}
+				ListNotTestedNodes.Add(nodeNeighbor);
 			}
+
+			float fPossiblyLowerGoal = nodeCurrent->fLocalGoal + distance(nodeCurrent, nodeNeighbor);
+
+
+			if (fPossiblyLowerGoal < nodeNeighbor->fLocalGoal)
+			{
+				nodeNeighbor->parent = nodeCurrent;
+				nodeNeighbor->fLocalGoal = fPossiblyLowerGoal;
+				nodeNeighbor->fGlobalGoal = nodeNeighbor->fLocalGoal + heuristic(nodeNeighbor, NodeEnd);
+
+
+			}
+
 		}
+
 	}
 
-	// Cleanup
-	for (FNode* Node : OpenSet) delete Node;
-	for (FNode* Node : ClosedSet) delete Node;
-
-	return Path;
-}
-
-TArray<FNode*> AGridManager::GetNeighbors(FNode* Node)
-{
-	TArray<FNode*> Neighbors;
-	int32 Index = TileArray.IndexOfByKey(Node->Tile);
-
-	if (Index != INDEX_NONE)
+	FNode* p = NodeEnd;
+	while (p->parent != nullptr)
 	{
-		// Retrieve adjacent tiles by index
-		if (Index - GridSizeX >= 0) Neighbors.Add(new FNode(TileArray[Index - GridSizeX])); // Up
-		if (Index + GridSizeX < TileArray.Num()) Neighbors.Add(new FNode(TileArray[Index + GridSizeX])); // Down
-		if (Index % GridSizeX > 0) Neighbors.Add(new FNode(TileArray[Index - 1])); // Left
-		if ((Index + 1) % GridSizeX > 0) Neighbors.Add(new FNode(TileArray[Index + 1])); // Right
+		DrawDebugLine(GetWorld(), p->WorldLocation, p->parent->WorldLocation, FColor::Green, false, 30.f, 40.f);
+
+		p = p->parent;
 	}
 
-	return Neighbors;
 }
-
-float AGridManager::CalculateHeuristic(ATile* StartTile, ATile* GoalTile)
-{
-	FVector StartLocation = StartTile->GetActorLocation();
-	FVector GoalLocation = GoalTile->GetActorLocation();
-	return FMath::Abs(StartLocation.X - GoalLocation.X) + FMath::Abs(StartLocation.Y - GoalLocation.Y);
-}
-
-
-
-
 

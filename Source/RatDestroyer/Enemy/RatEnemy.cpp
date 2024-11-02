@@ -29,7 +29,7 @@ void ARatEnemy::BeginPlay()
 void ARatEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MoveAlongPath(); // Call your movement logic here
+	
 }
 
 
@@ -48,55 +48,6 @@ bool ARatEnemy::AttackEnemy(float DamageTaken)
 }
 
 
-void ARatEnemy::SetPath(const TArray<FVector>& NewPath)
-{
-	
-	Path = NewPath;
-	CurrentPathIndex = 0;
-}
-
-
-void ARatEnemy::MoveAlongPath()
-{
-    float AcceptableDistance = 50.f;
-
-    // Check if the path is empty
-    if (Path.Num() == 0)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Path is empty, cannot move."));
-        return; // Avoid processing if there's no path
-    }
-
-    // Check if CurrentPathIndex is out of bounds
-    if (CurrentPathIndex >= Path.Num())
-    {
-        UE_LOG(LogTemp, Warning, TEXT("CurrentPathIndex is out of bounds!"));
-        return; // Prevent accessing out of bounds
-    }
-
-    FVector TargetLocation = Path[CurrentPathIndex];
-
-    // Move towards the target location
-    // Simple linear interpolation for movement
-    FVector CurrentLocation = GetActorLocation();
-    FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
-
-    // Move the enemy towards the target location
-    SetActorLocation(CurrentLocation + Direction * MovementSpeed * GetWorld()->DeltaTimeSeconds); // MoveSpeed should be defined in your class
-
-    // Check if reached the target location
-    if (FVector::Dist(CurrentLocation, TargetLocation) < AcceptableDistance) // Check if close enough to the target
-    {
-        CurrentPathIndex++; // Move to the next target
-
-        // Check if reached the end of the path
-        if (CurrentPathIndex >= Path.Num())
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Reached the end of the path."));
-            Destroy(); // Destroy or handle the enemy reaching the goal
-        }
-    }
-}
 
 
 

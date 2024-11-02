@@ -12,7 +12,7 @@
 
 class ATile;
 class ARatEnemy;
-
+//struct FNode;
 
 
 UCLASS()
@@ -56,27 +56,31 @@ public:
 	UPROPERTY()
 	TSet<FVector> BlockedTiles;
 
-
-	UFUNCTION()
-	bool IsTileBlocked(const FVector& TilePosition);
-
-	UFUNCTION()
-	bool IsWithinGrid(const FVector& Position) const;
-		
-	UFUNCTION()
-	ATile* GetTileLocation(FVector Location);
-
-
-
-	// the code below should be moved //
-
-	UFUNCTION()
-	TArray<ATile*>FindPath(ATile* StartTile, ATile* GoalTile);
 	
-	
+	TArray <FNode> Nodes;
+	int32 nMapWidth = 10;
+	int32 nMapHeight = 10;
+	FNode* NodeStart = nullptr;
+	FNode* NodeEnd = nullptr;
+
+	int32 relativeCoords[4][2] =
+	{
+		{0, -1}, {0, 1}, {-1, 0}, {1, 0}, //forward, backward, each side
+
+	};
+
+	//Functions
 	UFUNCTION()
-	float CalculateHeuristic(ATile* StartTile, ATile* GoalTile);
+	bool OnUserCreate();
+
+	UFUNCTION()
+	bool OnUserUpdate(float DeltaTime);
+
+	//UFUNCTION()
+	TArray<FNode>GetNeighbors(FNode& currentnode);
+
+	UFUNCTION()
+	void Solve_AStar();
 	
-	TArray<FNode*>GetNeighbors(FNode* Node);
 	
 };

@@ -81,7 +81,7 @@ void ATile::Tick(float DeltaTime)
 	FQuat BoxRotation = FQuat::Identity;
 
 	// Draw the debug box using the stored DebugBoxColor
-	DrawDebugBox(World, BoxLocation, BoxExtent, BoxRotation, DebugBoxColor, false, -1.f, 0, 5.f);
+	//DrawDebugBox(World, BoxLocation, BoxExtent, BoxRotation, DebugBoxColor, false, -1.f, 0, 5.f);
 
 
 }
