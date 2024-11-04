@@ -47,6 +47,12 @@ bool ARatEnemy::AttackEnemy(float DamageTaken)
 	return isAlive;
 }
 
+void ARatEnemy::startPath()
+{
+
+
+}
+
 
 
 

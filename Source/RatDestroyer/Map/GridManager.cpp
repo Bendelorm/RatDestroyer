@@ -95,7 +95,7 @@ bool AGridManager::OnUserCreate()
 			Node.X = x;
 			Node.Y = y;
 
-			bool bRandomBool = (FMath::FRand() <= 0.2); //probability of being an obstacle
+			bool bRandomBool = (FMath::FRand() <= 0.1); //probability of being an obstacle
 
 			if (bRandomBool)
 				Node.bObstacle = true;
@@ -121,7 +121,7 @@ bool AGridManager::OnUserCreate()
 			GetNeighbors(*Node);
 		}
 
-	NodeStart = &Nodes[1]; //assigning path nodes
+	NodeStart = &Nodes[0]; //assigning path nodes
 	NodeEnd = &Nodes[99];
 
 	DrawDebugBox(GetWorld(), NodeStart->WorldLocation, FVector(100, 100, 50), FColor::Blue, false, 200.f, 30.f);
@@ -183,6 +183,9 @@ TArray<FNode> AGridManager::GetNeighbors(FNode& currentnode)
 void AGridManager::Solve_AStar()
 {
 
+	//Clear all checkpoints before start
+	VisitedCheckpoints.Empty();
+
 	for (int32 i = 0; i < Nodes.Num(); i++)
 	{
 		FNode* Node = &Nodes[i];
@@ -225,6 +228,9 @@ void AGridManager::Solve_AStar()
 		nodeCurrent = ListNotTestedNodes[0];
 		nodeCurrent->bVisited = true; //we only visit a node once 
 
+		//Store info about checkpoints 
+		VisitedCheckpoints.Add(nodeCurrent->WorldLocation);
+
 		for (auto nodeNeighbor : nodeCurrent->Neighbors)
 		{
 
@@ -241,7 +247,7 @@ void AGridManager::Solve_AStar()
 				nodeNeighbor->parent = nodeCurrent;
 				nodeNeighbor->fLocalGoal = fPossiblyLowerGoal;
 				nodeNeighbor->fGlobalGoal = nodeNeighbor->fLocalGoal + heuristic(nodeNeighbor, NodeEnd);
-
+				
 
 			}
 
@@ -251,8 +257,15 @@ void AGridManager::Solve_AStar()
 
 	FNode* p = NodeEnd;
 	while (p->parent != nullptr)
+
 	{
 		DrawDebugLine(GetWorld(), p->WorldLocation, p->parent->WorldLocation, FColor::Green, false, 30.f, 40.f);
+		
+		for (int32 i = 0; i < VisitedCheckpoints.Num(); i++)
+		{
+			FString CheckpointString = VisitedCheckpoints[i].ToString();
+			GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Yellow, CheckpointString);
+		}
 
 		p = p->parent;
 	}

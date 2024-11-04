@@ -69,6 +69,9 @@ public:
 
 	};
 
+	TArray<FVector> VisitedCheckpoints;
+
+
 	//Functions
 	UFUNCTION()
 	bool OnUserCreate();

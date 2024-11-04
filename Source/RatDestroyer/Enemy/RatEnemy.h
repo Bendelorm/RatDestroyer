@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Ratdestroyer/Map/GridManager.h"
 #include "RatEnemy.generated.h"
 
 
@@ -47,14 +48,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isAlive;
 
+	UPROPERTY()
+	AGridManager* GridManager;
+
 public:
 	virtual bool AttackEnemy(float DamageTaken);
 
-	
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	TSubclassOf<ARatEnemy> EnemyClass;
 
+	//Functions
+
+	void startPath();
 
 	private:
 		
