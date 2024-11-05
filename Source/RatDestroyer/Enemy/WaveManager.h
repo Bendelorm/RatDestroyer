@@ -16,16 +16,12 @@ class RATDESTROYER_API AWaveManager : public AActor
 public:	
     // Sets default values for this actor's properties
     AWaveManager();
-    FVector StartLocation;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     int32 NumberOfEnemiesInWave = 5;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     TSubclassOf<AActor> EnemyClass;
-
-    //UFUNCTION(BlueprintCallable, Category = "Grid")
-    //void SpawnEnemy(int32 EnemyCount, TSubclassOf<ARatEnemy> EnemyType);
     
     UPROPERTY(BlueprintReadWrite, Category = wave)
     bool bActiveWave;
@@ -34,22 +30,14 @@ public:
     {
         return bActiveWave;
     }
-    
-    void StartWave() const;
 
-    UFUNCTION(BlueprintCallable, Category = "Wave")
+    void StartWave();
     void EndWave();
+    void SpawnEnemyInWave();
 
-    //Planlegger å adde ny enemy hver wave
-   // UFUNCTION(BlueprintCallable, Category = "Wave")
-    //void AddNewEnemy(ARatEnemy* newEnemy);
-    
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
-
- 
-
 private:
 
     UPROPERTY()
@@ -61,11 +49,8 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Wave")
     float SpawnInterval = 1.0f;
-    
-    void SpawnEnemyInWave();
-    
+
 public:
-    
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 

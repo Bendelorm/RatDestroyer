@@ -48,7 +48,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isAlive;
 
-	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
 	void Spawn();
 	
 	UPROPERTY()
