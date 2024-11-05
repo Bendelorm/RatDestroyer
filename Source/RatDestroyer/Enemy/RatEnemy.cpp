@@ -34,11 +34,10 @@ void ARatEnemy::BeginPlay()
 
 void ARatEnemy::Spawn()
 {
-	
-    	// Set the RatEnemy's location to the NodeStart's WorldLocation
-    	this->SetActorLocation(StartLocation);
-    
-    	UE_LOG(LogTemp, Warning, TEXT("RatEnemy spawned in the start"), *StartLocation.ToString());
+	Health = 10;
+	this->isAlive = true;
+	FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
+	this->SetActorLocation(SpawnLocation);
     
 }
 

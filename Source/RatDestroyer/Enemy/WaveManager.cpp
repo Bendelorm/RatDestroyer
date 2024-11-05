@@ -28,35 +28,8 @@ void AWaveManager::BeginPlay()
     if (!GridManager || !GridManager->NodeStart || !GridManager->NodeEnd)
     {
         UE_LOG(LogTemp, Error, TEXT("StartNode is nullptr"));
-        return;
     }
 }
-    void AWaveManager::SpawnEnemyInWave()
-    {
-    if (EnemySpawned >= NumberOfEnemiesInWave)
-    {
-        EndWave();
-        return;
-    }
-        SpawnEnemy(1, TSubclassOf<ARatEnemy>(EnemyClass));
-        EnemySpawned++;
-    
-
-    if (GridManager && GridManager->NodeStart)
-    {
-        FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
-        FRotator SpawnRotation = FRotator::ZeroRotator;
-
-        // Spawn the enemy
-        ARatEnemy* SpawnedEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyClass, SpawnLocation, SpawnRotation);
-        
-        if (SpawnedEnemy)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Spawned RatEnemy at: %s"), *SpawnLocation.ToString());
-            EnemySpawned++;
-        }
-    }
-    }
 
     void AWaveManager::EndWave()
     {

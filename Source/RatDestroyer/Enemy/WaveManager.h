@@ -25,7 +25,7 @@ public:
     TSubclassOf<AActor> EnemyClass;
 
     //UFUNCTION(BlueprintCallable, Category = "Grid")
-    void SpawnEnemy(int32 EnemyCount, TSubclassOf<ARatEnemy> EnemyType);
+    //void SpawnEnemy(int32 EnemyCount, TSubclassOf<ARatEnemy> EnemyType);
     
     UPROPERTY(BlueprintReadWrite, Category = wave)
     bool bActiveWave;
