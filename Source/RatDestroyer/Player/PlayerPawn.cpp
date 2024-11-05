@@ -142,6 +142,9 @@ void APlayerPawn::BuildTower(ATile* TargetTile)
 	SelectedTower->AttachToComponent(SelectedTile->GetStaticMesh(), AttachmentRules, FName(TEXT("TowerSocket")));
 	TowerManager->Push(SelectedTower);
 	SelectedTile->SetHasTower(true);
+	int32 TileIndex = GridManager->TileArray.Find(SelectedTile);
+	GridManager->Nodes[TileIndex].bObstacle = true;
+	GridManager->Solve_AStar();
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Placed Tower")));
 
 }

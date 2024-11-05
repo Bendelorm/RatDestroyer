@@ -3,7 +3,6 @@
 
 
 #include "GridManager.h"
-#include "Node.h"
 #include "Tile.h"
 
 
@@ -36,14 +35,9 @@ void AGridManager::BeginPlay()
 	Super::BeginPlay();
 	
 	// A* 
-	OnUserCreate();
-	OnUserUpdate(0);
-
-	FTimerHandle T;
-	GetWorld()->GetTimerManager().SetTimer(T, [&]()
-		{
-			Solve_AStar();
-		}, 2.f, false);
+	CreateGraph();
+	//UpdateGraph(0);
+	Solve_AStar();
 	// A*
 
 
@@ -82,10 +76,7 @@ void AGridManager::Tick(float DeltaTime)
 }
 
 
-
-
-
-bool AGridManager::OnUserCreate()
+void AGridManager::CreateGraph()
 {
 	for (int32 x = 0; x < nMapWidth; x++)
 		for (int32 y = 0; y < nMapHeight; y++)
@@ -95,20 +86,20 @@ bool AGridManager::OnUserCreate()
 			Node.X = x;
 			Node.Y = y;
 
-			bool bRandomBool = (FMath::FRand() <= 0.1); //probability of being an obstacle
+			//bool bRandomBool = (FMath::FRand() <= 0.1); //probability of being an obstacle
 
-			if (bRandomBool)
-				Node.bObstacle = true;
+			//if (bRandomBool)
+			//	Node.bObstacle = true;
 
-			else
-			{
-				Node.bObstacle = false;
-			}
+			//else
+			//{
+			//	Node.bObstacle = false;
+			//}
 
 
 			Node.bVisited = false;
 			Node.parent = nullptr;
-			Node.WorldLocation = FVector(x * 100, y * 100, 0); //set size of node
+			Node.WorldLocation = FVector(x* TileSize, y * TileSize, 0); //set size of node
 			Nodes.Add(Node);
 		}
 
@@ -126,38 +117,31 @@ bool AGridManager::OnUserCreate()
 
 	DrawDebugBox(GetWorld(), NodeStart->WorldLocation, FVector(100, 100, 50), FColor::Blue, false, 200.f, 30.f);
 	DrawDebugBox(GetWorld(), NodeEnd->WorldLocation, FVector(100, 100, 50), FColor::Red, false, 200.f, 30.f);
-
-
-	return true;
 }
 
-bool AGridManager::OnUserUpdate(float DeltaTime)
-{
-
-	for (int32 x = 0; x < nMapWidth; x++)
-		for (int32 y = 0; y < nMapHeight; y++)
-		{
-			int32 CurIndexNode = y * nMapWidth + x;
-			FNode* CurrentNode = &Nodes[CurIndexNode];
-			FVector CenterOfNode = CurrentNode->WorldLocation;
-
-			if (CurrentNode->bObstacle)
-				DrawDebugBox(GetWorld(), CenterOfNode, FVector(100, 100, 50), FColor::Black, false, 200.f, 10.f);
-
-			else
-			{
-				DrawDebugBox(GetWorld(), CenterOfNode, FVector(100, 100, 50), FColor::White, false, 200.f, 10.f);
-			}
-
-			if (CurrentNode->bVisited)
-				DrawDebugBox(GetWorld(), CurrentNode->WorldLocation, FVector(100, 100, 50), FColor::Turquoise, false, 200.f, 16.f);
-
-
-		}
-
-
-	return true;
-}
+//void AGridManager::UpdateGraph(float DeltaTime)
+//{
+//	for (int32 x = 0; x < nMapWidth; x++)
+//		for (int32 y = 0; y < nMapHeight; y++)
+//		{
+//			int32 CurIndexNode = y * nMapWidth + x;
+//			FNode* CurrentNode = &Nodes[CurIndexNode];
+//			FVector CenterOfNode = CurrentNode->WorldLocation;
+//
+//			if (CurrentNode->bObstacle)
+//				DrawDebugBox(GetWorld(), CenterOfNode, FVector(100, 100, 100), FColor::Black, false, 200.f, 10.f);
+//
+//			else
+//			{
+//				DrawDebugBox(GetWorld(), CenterOfNode, FVector(100, 100, 100), FColor::White, false, 200.f, 10.f);
+//			}
+//
+//			if (CurrentNode->bVisited)
+//				DrawDebugBox(GetWorld(), CurrentNode->WorldLocation, FVector(100, 100, 100), FColor::Turquoise, false, 200.f, 16.f);
+//
+//
+//		}
+//}
 
 TArray<FNode> AGridManager::GetNeighbors(FNode& currentnode)
 {
@@ -259,14 +243,13 @@ void AGridManager::Solve_AStar()
 	while (p->parent != nullptr)
 
 	{
-		DrawDebugLine(GetWorld(), p->WorldLocation, p->parent->WorldLocation, FColor::Green, false, 30.f, 40.f);
+		DrawDebugLine(GetWorld(), p->WorldLocation, p->parent->WorldLocation, FColor::Green, false, 2.f, 40.f, 10.f);
 		
 		for (int32 i = 0; i < VisitedCheckpoints.Num(); i++)
 		{
 			FString CheckpointString = VisitedCheckpoints[i].ToString();
-			GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Yellow, CheckpointString);
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, CheckpointString);
 		}
-
 		p = p->parent;
 	}
 

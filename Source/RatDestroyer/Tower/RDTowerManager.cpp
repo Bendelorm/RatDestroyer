@@ -44,6 +44,9 @@ AActor* ARDTowerManager::Pop()
 		{
 			ParentTile = TileInArray;
 			ParentTile->SetHasTower(false);
+			int32 TileIndex = GridManager->TileArray.Find(ParentTile);
+			GridManager->Nodes[TileIndex].bObstacle = false;
+			GridManager->Solve_AStar();
 		}
 	}
 	TopTowerActor->Destroy();

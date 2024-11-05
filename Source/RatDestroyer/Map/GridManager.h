@@ -4,16 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DrawDebugHelpers.h"
 #include "Components/SceneComponent.h"
-#include "Node.h"
 #include "GridManager.generated.h"
-
-
 
 class ATile;
 class ARatEnemy;
-//struct FNode;
 
+USTRUCT(BlueprintType)
+struct FNode
+{
+	GENERATED_BODY()
+public:
+	bool bObstacle = false;
+	bool bVisited = false;
+	float fGlobalGoal;
+	float fLocalGoal;
+	int32 X;
+	int32 Y;
+	FVector WorldLocation;
+	TArray<FNode*> Neighbors;
+	int32 Index;
+	FNode* parent;
+};
 
 UCLASS()
 class RATDESTROYER_API AGridManager : public AActor
@@ -56,7 +69,7 @@ public:
 	UPROPERTY()
 	TSet<FVector> BlockedTiles;
 
-	
+	UPROPERTY()
 	TArray <FNode> Nodes;
 	int32 nMapWidth = 10;
 	int32 nMapHeight = 10;
@@ -71,19 +84,15 @@ public:
 
 	TArray<FVector> VisitedCheckpoints;
 
-
-	//Functions
 	UFUNCTION()
-	bool OnUserCreate();
-
-	UFUNCTION()
-	bool OnUserUpdate(float DeltaTime);
+	void CreateGraph();
 
 	//UFUNCTION()
-	TArray<FNode>GetNeighbors(FNode& currentnode);
+	////void UpdateGraph(float DeltaTime);
+
+	UFUNCTION()
+	TArray<FNode>GetNeighbors(FNode& currentNode);
 
 	UFUNCTION()
 	void Solve_AStar();
-	
-	
 };
