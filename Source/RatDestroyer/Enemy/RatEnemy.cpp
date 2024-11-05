@@ -2,8 +2,9 @@
 
 
 #include "RatEnemy.h"
+#include "RatDestroyer/Map/GridManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "Kismet/GameplayStatics.h"
 
 
 ARatEnemy::ARatEnemy()
@@ -21,17 +22,35 @@ ARatEnemy::ARatEnemy()
 
 // Called when the game starts or when spawned
 void ARatEnemy::BeginPlay()
-{
+{ 
 	Super::BeginPlay();
-	
+
+	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+	GridManager->NodeStart->WorldLocation;
+	Spawn();
 }
+
+
+
+void ARatEnemy::Spawn()
+{
+	
+    	// Set the RatEnemy's location to the NodeStart's WorldLocation
+    	this->SetActorLocation(StartLocation);
+    
+    	UE_LOG(LogTemp, Warning, TEXT("RatEnemy spawned in the start"), *StartLocation.ToString());
+    
+}
+
+
+
+
 
 void ARatEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
 }
-
 
 
 //Function to reduce RatEnemy Health  by the damage number and check if Rat Enemy is still alive

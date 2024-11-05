@@ -16,7 +16,8 @@ class RATDESTROYER_API AWaveManager : public AActor
 public:	
     // Sets default values for this actor's properties
     AWaveManager();
-	
+    FVector StartLocation;
+    
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     int32 NumberOfEnemiesInWave = 5;
 
@@ -34,7 +35,7 @@ public:
         return bActiveWave;
     }
     
-    void StartWave();
+    void StartWave() const;
 
     UFUNCTION(BlueprintCallable, Category = "Wave")
     void EndWave();

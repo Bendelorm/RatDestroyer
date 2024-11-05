@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RatDestroyer/Map/GridManager.h"
 #include "GameFramework/Character.h"
-#include "Ratdestroyer/Map/GridManager.h"
 #include "RatEnemy.generated.h"
 
 
@@ -48,12 +48,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isAlive;
 
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void Spawn();
+	
 	UPROPERTY()
 	AGridManager* GridManager;
 
 public:
 	virtual bool AttackEnemy(float DamageTaken);
 
+	FVector StartLocation;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	TSubclassOf<ARatEnemy> EnemyClass;
 
@@ -61,7 +66,7 @@ public:
 
 	void startPath();
 
-	private:
+	//void MoveToNextNode();
 		
 
 	

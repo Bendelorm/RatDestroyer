@@ -2,7 +2,8 @@
 
 
 #include "WaveManager.h"
-#include "EngineUtils.h"
+#include "RatDestroyer/Map/GridManager.h"
+
 
 
 
@@ -19,29 +20,17 @@ AWaveManager::AWaveManager(): GridManager(nullptr), EnemySpawned(0)
 void AWaveManager::BeginPlay()
 {
     Super::BeginPlay();
-
-    for (TActorIterator<AGridManager> It(GetWorld()); It;)
-    {
-        GridManager = *It;
-        break;
-    }
-    if (!GridManager)
-    {
-        UE_LOG(LogTemp, Error, TEXT("WaveManager and gridmanager dont find eachother."));
-    }
+    GridManager->NodeStart->WorldLocation;
 }
 
-    void AWaveManager::StartWave()
+    void AWaveManager::StartWave() const
     {
-        if (EnemyClass)
-        {
-            bActiveWave = true;
-            EnemySpawned = 0;
-
-            GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &AWaveManager::SpawnEnemyInWave, SpawnInterval, true);
-        }
+    if (!GridManager || !GridManager->NodeStart || !GridManager->NodeEnd)
+    {
+        UE_LOG(LogTemp, Error, TEXT("StartNode is nullptr"));
+        return;
     }
-
+}
     void AWaveManager::SpawnEnemyInWave()
     {
     if (EnemySpawned >= NumberOfEnemiesInWave)
@@ -51,6 +40,22 @@ void AWaveManager::BeginPlay()
     }
         SpawnEnemy(1, TSubclassOf<ARatEnemy>(EnemyClass));
         EnemySpawned++;
+    
+
+    if (GridManager && GridManager->NodeStart)
+    {
+        FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
+        FRotator SpawnRotation = FRotator::ZeroRotator;
+
+        // Spawn the enemy
+        ARatEnemy* SpawnedEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyClass, SpawnLocation, SpawnRotation);
+        
+        if (SpawnedEnemy)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Spawned RatEnemy at: %s"), *SpawnLocation.ToString());
+            EnemySpawned++;
+        }
+    }
     }
 
     void AWaveManager::EndWave()
@@ -66,54 +71,6 @@ void AWaveManager::BeginPlay()
     UE_LOG(LogTemp, Warning, TEXT("Wave ended and timer has been reset."));
     }
 
-void AWaveManager::SpawnEnemy(int32 EnemyCount, TSubclassOf<ARatEnemy> EnemyType)
-{
-    if (GridManager == nullptr || EnemyType == nullptr)
-    {
-        UE_LOG(LogTemp, Error, TEXT("GridManager or EnemyType is null, cannot spawn enemy."));
-        return;
-    }
-
-    // Assuming GridManager has TileArray available
-    if (GridManager->TileArray.Num() < 2)
-    {
-        UE_LOG(LogTemp, Error, TEXT("Not enough tiles to spawn an enemy."));
-        return;
-    }
-
-    ATile* StartTile = GridManager->TileArray[0];
-    ATile* GoalTile = GridManager->TileArray[GridManager->TileArray.Num() - 1];
-
-    FVector SpawnLocation = StartTile->GetActorLocation() + FVector(0, 0, 200.f);
-   
-    // Spawn the enemy
-    ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyType, SpawnLocation, FRotator::ZeroRotator);
-
-    if (NewEnemy)
-    {
-        // Use FindPath with ATile* parameters
-            GridManager->Solve_AStar(); // Assuming FindPath is still in GridManager
-
-        // Pass tile locations to the enemy's path as FVectors
-        //TArray<FVector> PathLocations;
-        //for (ATile* Tile : Path)
-        //{
-        //    PathLocations.Add(Tile->GetActorLocation());
-        //}
-
-        //if (PathLocations.Num() > 0)
-        //{
-        //    NewEnemy->SetPath(PathLocations);
-        //    UE_LOG(LogTemp, Warning, TEXT("Enemy spawned and path set with %d locations."), PathLocations.Num());
-        //}
-        //else
-        //{
-        //    UE_LOG(LogTemp, Error, TEXT("Failed to find a path for the enemy from %s to %s"), *SpawnLocation.ToString(), *GoalTile->GetActorLocation().ToString());
-        //    // Optionally, destroy the enemy if the path is invalid
-        //    NewEnemy->Destroy();
-        //}
-    }
-}
 
 // Called every frame
 void AWaveManager::Tick(float DeltaTime)
