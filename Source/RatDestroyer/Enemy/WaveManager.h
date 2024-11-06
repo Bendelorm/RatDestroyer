@@ -19,10 +19,7 @@ public:
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     int32 NumberOfEnemiesInWave;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
-    TSubclassOf<AActor> EnemyClass;
-
+    
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     TSubclassOf<ARatEnemy> TheRat;
     
@@ -37,8 +34,8 @@ public:
     TObjectPtr<AGridManager> NodeEnd = nullptr;
     
     void StartWave();
-    void EndWave();
-    void SpawnEnemyInWave();
+    //void EndWave();
+    //void SpawnEnemyInWave();
 
     UFUNCTION(BlueprintCallable, Category = "Spawning")
     void Spawn();
@@ -47,8 +44,8 @@ protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave")
-    int64 NewEnemiesPerWave;
+    //UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave")
+    //int64 NewEnemiesPerWave;
     
 private:
 
@@ -58,10 +55,7 @@ private:
     // This is the Timer for spawning of Enemy
     FTimerHandle WaveTimerHandle;
     int32 EnemiesSpawned;
-
-    //UPROPERTY(EditDefaultsOnly, Category = "Wave")
-    //float SpawnInterval = 1.0f;
-
+    
     UPROPERTY(EditDefaultsOnly, Category = "Wave")
     FTimerHandle SpawnTimerHandle;
 

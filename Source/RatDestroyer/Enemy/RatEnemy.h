@@ -62,6 +62,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 CurrentCheckpointIndex;
 
+	void TeleportGlobal(FVector newLocation);
 	//Functions
 
 	void startPath();

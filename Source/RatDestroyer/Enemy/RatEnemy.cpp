@@ -59,6 +59,10 @@ void ARatEnemy::startPath()
 	GridManager->VisitedCheckpoints[0];
 }
 
+void ARatEnemy::TeleportGlobal(FVector newLocation)
+{
+	this->SetActorLocation(newLocation);
+}
 
 
 
