@@ -47,9 +47,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isAlive;
-
-	UFUNCTION(BlueprintCallable, Category = "Spawning")
-	void Spawn();
 	
 	UPROPERTY()
 	AGridManager* GridManager;
@@ -61,6 +58,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	TSubclassOf<ARatEnemy> EnemyClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
+	int32 CurrentCheckpointIndex;
 
 	//Functions
 

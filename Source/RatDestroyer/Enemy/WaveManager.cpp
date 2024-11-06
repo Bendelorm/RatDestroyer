@@ -23,6 +23,7 @@ void AWaveManager::BeginPlay()
     Super::BeginPlay();
     GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
     GridManager->NodeStart->WorldLocation;
+    Spawn();
 }
 
     void AWaveManager::StartWave() 
@@ -66,6 +67,13 @@ void AWaveManager::BeginPlay()
     {
         UE_LOG(LogTemp, Error, TEXT("EnemyClass is not set or NodeStart is wrong"));
     }
+}
+
+void AWaveManager::Spawn()
+{
+    AActor* RatEnemy = GetWorld()->SpawnActor(TheRat);
+    FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
+    this->SetActorLocation(SpawnLocation);
 }
 
 void AWaveManager::EndWave()

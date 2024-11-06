@@ -15,6 +15,7 @@ ARatEnemy::ARatEnemy()
 	MovementSpeed = 300.0f;
 	Health = 10;
 	bIsMoving = false;
+	CurrentCheckpointIndex = 0;
 	
 	
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
@@ -27,30 +28,19 @@ void ARatEnemy::BeginPlay()
 
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	GridManager->NodeStart->WorldLocation;
-	Spawn();
+	startPath();
 }
-
-
-
-void ARatEnemy::Spawn()
-{
-	Health = 10;
-	this->isAlive = true;
-	FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
-	this->SetActorLocation(SpawnLocation);
-    
-}
-
-
-
 
 
 void ARatEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+	if (GridManager->VisitedCheckpoints.Num() == 0)
+	{
+		return;
+	}
+	//FVector CurrentCheckpoint = GridManager->VisitedCheckpoints
 }
-
 
 //Function to reduce RatEnemy Health  by the damage number and check if Rat Enemy is still alive
 bool ARatEnemy::AttackEnemy(float DamageTaken)
@@ -67,7 +57,6 @@ bool ARatEnemy::AttackEnemy(float DamageTaken)
 
 void ARatEnemy::startPath()
 {
-
 
 }
 

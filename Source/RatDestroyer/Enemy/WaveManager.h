@@ -22,6 +22,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     TSubclassOf<AActor> EnemyClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
+    TSubclassOf<ARatEnemy> TheRat;
     
     UPROPERTY(BlueprintReadWrite, Category = wave)
     bool bActiveWave;
@@ -34,6 +37,9 @@ public:
     void StartWave();
     void EndWave();
     void SpawnEnemyInWave();
+
+    UFUNCTION(BlueprintCallable, Category = "Spawning")
+    void Spawn();
 
 protected:
     // Called when the game starts or when spawned
