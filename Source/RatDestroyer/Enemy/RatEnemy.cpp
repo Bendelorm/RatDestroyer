@@ -51,13 +51,12 @@ bool ARatEnemy::AttackEnemy(float DamageTaken)
 	{
 		isAlive = false;
 	}
-	//Returns the status of enemy (true if its Alive and False if not)
 	return isAlive;
 }
 
 void ARatEnemy::startPath()
 {
-
+	GridManager->VisitedCheckpoints[0];
 }
 
 

@@ -18,7 +18,7 @@ public:
     AWaveManager();
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
-    int32 NumberOfEnemiesInWave = 5;
+    int32 NumberOfEnemiesInWave;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     TSubclassOf<AActor> EnemyClass;
@@ -26,14 +26,16 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     TSubclassOf<ARatEnemy> TheRat;
     
-    UPROPERTY(BlueprintReadWrite, Category = wave)
-    bool bActiveWave;
+    UPROPERTY(BlueprintReadWrite, Category = "Wave", meta = (AllowPrivateAccess = "true"))
+    bool bActiveWave = false;
 
-    bool GetActiveWave() const
-    {
-        return bActiveWave;
-    }
+    
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AGridManager> NodeStart = nullptr;
 
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AGridManager> NodeEnd = nullptr;
+    
     void StartWave();
     void EndWave();
     void SpawnEnemyInWave();
@@ -44,6 +46,10 @@ public:
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave")
+    int64 NewEnemiesPerWave;
+    
 private:
 
     UPROPERTY()
@@ -51,10 +57,13 @@ private:
     
     // This is the Timer for spawning of Enemy
     FTimerHandle WaveTimerHandle;
-    int32 EnemySpawned;
+    int32 EnemiesSpawned;
+
+    //UPROPERTY(EditDefaultsOnly, Category = "Wave")
+    //float SpawnInterval = 1.0f;
 
     UPROPERTY(EditDefaultsOnly, Category = "Wave")
-    float SpawnInterval = 1.0f;
+    FTimerHandle SpawnTimerHandle;
 
 public:
     // Called every frame
