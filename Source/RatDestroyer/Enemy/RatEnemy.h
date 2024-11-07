@@ -54,7 +54,10 @@ protected:
 public:
 	virtual bool AttackEnemy(float DamageTaken);
 
+	
 	FVector StartLocation;
+	FVector NextCheckpoint;
+	FTimerHandle MovementTimerHandle;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	TSubclassOf<ARatEnemy> EnemyClass;
@@ -64,10 +67,10 @@ public:
 	
 	//Functions
 
-	void startPath();
 
-	//void MoveToNextNode();
-		
+	void MoveTowardsNextCheckpoint();
+	void startPath();
+	
 
 	
 };
