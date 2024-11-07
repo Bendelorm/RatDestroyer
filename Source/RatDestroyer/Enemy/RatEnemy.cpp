@@ -72,7 +72,7 @@ void ARatEnemy::startPath()
 void ARatEnemy::MoveTowardsNextCheckpoint()
 {
 	// Checks for the checkpoints and allows movement
-	if (!bIsMoving || !GridManager || GridManager->VisitedCheckpoints.Num() == 0)
+	if (!bIsMoving || !GridManager || GridManager->PathCheckpoints.Num() == 0)
 	{
 		return;
 	}
@@ -94,9 +94,9 @@ void ARatEnemy::MoveTowardsNextCheckpoint()
 		CurrentCheckpointIndex++;
 
 		// Check if there are more checkpoints
-		if (CurrentCheckpointIndex < GridManager->VisitedCheckpoints.Num())
+		if (CurrentCheckpointIndex < GridManager->PathCheckpoints.Num())
 		{
-			NextCheckpoint = GridManager->VisitedCheckpoints[CurrentCheckpointIndex];
+			NextCheckpoint = GridManager->PathCheckpoints[CurrentCheckpointIndex];
 			NextCheckpoint.Z = 100.0f; 
 		}
 		else
