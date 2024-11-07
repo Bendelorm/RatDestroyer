@@ -88,6 +88,8 @@ public:
 
 	TArray<FVector> VisitedCheckpoints;
 
+	TArray<FVector> PathCheckpoints;
+
 	UFUNCTION()
 	void CreateGraph();
 

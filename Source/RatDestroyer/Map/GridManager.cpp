@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "RatDestroyer/Tower/RDTowerManager.h"
 #include "RatDestroyer/TreeTesting/RDTreeManager.h"
+#include "Algo/Reverse.h"
 
 
 // Sets default values
@@ -26,7 +27,6 @@ AGridManager::AGridManager()
 	{
 		SceneComponent->SetupAttachment(RootComponent);
 	}
-	
 
 }
 
@@ -172,6 +172,7 @@ void AGridManager::Solve_AStar()
 
 	//Clear all checkpoints before start
 	VisitedCheckpoints.Empty();
+	PathCheckpoints.Empty();
 
 	for (int32 i = 0; i < Nodes.Num(); i++)
 	{
@@ -244,17 +245,19 @@ void AGridManager::Solve_AStar()
 	while (p->parent != nullptr)
 
 	{
+		PathCheckpoints.Add(p->WorldLocation);
 		DrawDebugLine(GetWorld(), p->WorldLocation, p->parent->WorldLocation, FColor::Green, false, 2.f, 40.f, 10.f);
-		for (int32 i = 0; i < VisitedCheckpoints.Num(); i++)
-		{
-			//FString CheckpointString = VisitedCheckpoints[i].ToString();
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, CheckpointString);
-		}
 		p = p->parent;
 	}
 	if (NodeEnd->parent == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("No path found to destination!"));
 		TowerManager->Pop();
+	}
+	Algo::Reverse(PathCheckpoints);
+
+	for (int i = 0; i < PathCheckpoints.Num(); i++)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, PathCheckpoints[i].ToString());
 	}
 }
