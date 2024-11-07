@@ -40,7 +40,10 @@ void AWaveManager::BeginPlay()
 
         EnemiesSpawned = 0;
         bActiveWave = true;
-        float SpawnInterval = 0.25f;
+
+        // This continues to spawn more Enemies
+        float SpawnInterval = 2.0f;
+        Spawn();
         GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AWaveManager::Spawn, SpawnInterval, true);
     }
 
@@ -49,24 +52,28 @@ void AWaveManager::Spawn()
     // Checkh for how many Enemies need to spawn
     int32 EnemiesToSpawn = NumberOfEnemiesInWave - EnemiesSpawned;
 
-    // Spawn multiple enemies 
-    for (int32 i = 0; i < EnemiesToSpawn; ++i)
+    // if enemies are spawned in stop the wave
+    if (EnemiesSpawned >= NumberOfEnemiesInWave)
     {
-        FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
-        ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(TheRat, SpawnLocation, FRotator::ZeroRotator);
+        GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle); 
+        bActiveWave = false; 
+        return; 
+    }
 
-        if (NewEnemy)
-        {
-            EnemiesSpawned++;
-            UE_LOG(LogTemp, Log, TEXT("Enemy Spawned: %d out of %d"), EnemiesSpawned, NumberOfEnemiesInWave);
-        }
+    // Spawn one enemy
+    FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
+    ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(TheRat, SpawnLocation, FRotator::ZeroRotator);
+
+    if (NewEnemy)
+    {
+        EnemiesSpawned++;  // Adds more enemies
+        UE_LOG(LogTemp, Log, TEXT("Enemy Spawned: %d out of %d"), EnemiesSpawned, NumberOfEnemiesInWave);
     }
 
     // Stop Wave when all enemies are spawnes in
-    if (EnemiesSpawned >= NumberOfEnemiesInWave)
+    if (EnemiesSpawned < NumberOfEnemiesInWave)
     {
-        GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
-        bActiveWave = false; // innactive wave
+        GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AWaveManager::Spawn, 0.25f, false); // Call Spawn again after 0.25 seconds
     }
 }
 
