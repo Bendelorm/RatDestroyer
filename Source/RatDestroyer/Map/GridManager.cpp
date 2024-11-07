@@ -4,8 +4,10 @@
 
 #include "GridManager.h"
 #include "Tile.h"
-
-
+#include "Kismet/GameplayStatics.h"
+#include "RatDestroyer/Tower/RDTowerManager.h"
+#include "RatDestroyer/TreeTesting/RDTreeManager.h"
+#include "Algo/Reverse.h"
 
 
 // Sets default values
@@ -25,7 +27,6 @@ AGridManager::AGridManager()
 	{
 		SceneComponent->SetupAttachment(RootComponent);
 	}
-	
 
 }
 
@@ -39,6 +40,8 @@ void AGridManager::BeginPlay()
 	//UpdateGraph(0);
 	Solve_AStar();
 	// A*
+	TowerManager = Cast<ARDTowerManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ARDTowerManager::StaticClass()));
+
 
 
 	for (int32 X = 0; X < GridSizeX; ++X)
@@ -169,6 +172,7 @@ void AGridManager::Solve_AStar()
 
 	//Clear all checkpoints before start
 	VisitedCheckpoints.Empty();
+	PathCheckpoints.Empty();
 
 	for (int32 i = 0; i < Nodes.Num(); i++)
 	{
@@ -202,13 +206,12 @@ void AGridManager::Solve_AStar()
 	{
 		//sorts untested nodes by the globalgoal, lowest is first
 		ListNotTestedNodes.Sort([](const FNode& lhs, const FNode& rhs) {return lhs.fGlobalGoal < rhs.fGlobalGoal; });
-
+		
 		while (ListNotTestedNodes.Num() > 0 && ListNotTestedNodes[0]->bVisited)
 			ListNotTestedNodes.RemoveAt(0);
 
 		if (ListNotTestedNodes.Num() == 0)
 			break;
-
 		nodeCurrent = ListNotTestedNodes[0];
 		nodeCurrent->bVisited = true; //we only visit a node once 
 
@@ -231,7 +234,6 @@ void AGridManager::Solve_AStar()
 				nodeNeighbor->parent = nodeCurrent;
 				nodeNeighbor->fLocalGoal = fPossiblyLowerGoal;
 				nodeNeighbor->fGlobalGoal = nodeNeighbor->fLocalGoal + heuristic(nodeNeighbor, NodeEnd);
-				
 
 			}
 
@@ -243,15 +245,19 @@ void AGridManager::Solve_AStar()
 	while (p->parent != nullptr)
 
 	{
+		PathCheckpoints.Add(p->WorldLocation);
 		DrawDebugLine(GetWorld(), p->WorldLocation, p->parent->WorldLocation, FColor::Green, false, 2.f, 40.f, 10.f);
-		
-		for (int32 i = 0; i < VisitedCheckpoints.Num(); i++)
-		{
-			FString CheckpointString = VisitedCheckpoints[i].ToString();
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, CheckpointString);
-		}
 		p = p->parent;
 	}
+	if (NodeEnd->parent == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("No path found to destination!"));
+		TowerManager->Pop();
+	}
+	Algo::Reverse(PathCheckpoints);
 
+	for (int i = 0; i < PathCheckpoints.Num(); i++)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, PathCheckpoints[i].ToString());
+	}
 }
-
