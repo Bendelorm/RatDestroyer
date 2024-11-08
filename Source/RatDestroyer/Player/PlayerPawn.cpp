@@ -42,6 +42,7 @@ APlayerPawn::APlayerPawn()
 	ScreenEdgePadding = FVector2D(50, 50);
 	ZoomSpeed = 800;
 	RotationSpeed = 50;
+	Money = 50;
 
 	SetActorRotation(FRotator::MakeFromEuler(FVector3d(0, -30, 0)));
 
@@ -107,15 +108,15 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 				}
 			}
 		}
-		else
+	}
+	else
+	{
+		AActor* SelectedActor = HitResult.GetActor();
+		if (SelectedActor)
 		{
-			AActor* SelectedActor = HitResult.GetActor();
-			if (SelectedActor)
-			{
-				//debug for testing
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You selected: %s"), *SelectedActor->GetName()));
-				//Code for what happens when you select something
-			}
+			//debug for testing
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You selected: %s"), *SelectedActor->GetName()));
+			//Code for what happens when you select something
 		}
 	}
 }
@@ -143,15 +144,18 @@ void APlayerPawn::BuildTower(ATile* TargetTile)
 	{
 		return;
 	}
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	SelectedTower->AttachToComponent(SelectedTile->GetStaticMesh(), AttachmentRules, FName(TEXT("TowerSocket")));
-	TowerManager->Push(SelectedTower);
-	SelectedTile->SetHasTower(true);
-	int32 TileIndex = GridManager->TileArray.Find(SelectedTile);
-	GridManager->Nodes[TileIndex].bObstacle = true;
-	GridManager->Solve_AStar();
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Placed Tower")));
-
+	if (Money >= Tower->BaseCost)
+	{
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		SelectedTower->AttachToComponent(SelectedTile->GetStaticMesh(), AttachmentRules, FName(TEXT("TowerSocket")));
+		TowerManager->Push(SelectedTower);
+		SelectedTile->SetHasTower(true);
+		int32 TileIndex = GridManager->TileArray.Find(SelectedTile);
+		GridManager->Nodes[TileIndex].bObstacle = true;
+		GridManager->Solve_AStar();
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Placed Tower")));
+		Money = Money - Tower->BaseCost;
+	}
 }
 
  
@@ -159,7 +163,6 @@ void APlayerPawn::UndoTower(const FInputActionValue& Value)
 {
 	TowerManager->Pop();
 }
-
 
 
 
@@ -176,6 +179,7 @@ void APlayerPawn::BeginPlay()
 		PlayerController->bEnableClickEvents = true;
 		GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 		TowerManager = Cast<ARDTowerManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ARDTowerManager::StaticClass()));
+		Tower = Cast<ARDTowerActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ARDTowerActor::StaticClass()));
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(IMC, 0);

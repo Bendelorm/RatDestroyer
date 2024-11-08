@@ -33,6 +33,8 @@ public:
 
 	TObjectPtr<ARDTowerManager> TowerManager;
 
+	TObjectPtr<ARDTowerActor> Tower;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -70,6 +72,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
 	TSubclassOf<ARDTowerActor> BaseTower;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")
+	int32 Money;
+
 
 
 	//Input Mapping Context and Actions

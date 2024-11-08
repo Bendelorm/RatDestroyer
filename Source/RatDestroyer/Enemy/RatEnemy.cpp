@@ -18,6 +18,7 @@ ARatEnemy::ARatEnemy()
 	MovementSpeed = 300.0f;
 	Health = 10;
 	bIsMoving = false;
+	isAlive = true;
 	CurrentCheckpointIndex = 0;
 	
 	
@@ -42,15 +43,34 @@ void ARatEnemy::Tick(float DeltaTime)
 }
 
 //Function to reduce RatEnemy Health  by the damage number and check if Rat Enemy is still alive
-bool ARatEnemy::AttackEnemy(float DamageTaken)
+void ARatEnemy::AttackEnemy(float DamageTaken)
 {
+	UE_LOG(LogTemp, Log, TEXT("%p Shot"), this);
 	this->Health -= DamageTaken;
-	
 	if(this->Health <= 0)
 	{
 		isAlive = false;
+		Death();
 	}
-	return isAlive;
+}
+
+void ARatEnemy::Death()
+{
+
+	if (isAlive)
+	{
+		Destroy();
+	}
+	if (!isAlive)
+	{
+		Destroy();
+		//Give Player Money
+		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (PlayerPawn)
+		{
+			PlayerPawn->Money = PlayerPawn->Money + 5;
+		}
+	}
 }
 
 void ARatEnemy::startPath()
@@ -69,20 +89,6 @@ void ARatEnemy::startPath()
 	// Set up a timer to call MoveTowardsNextCheckpoint regularly for smooth movement
 	float MoveInterval = 0.02f; // Controls how often MoveTowardsNextCheckpoint updates
 	GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ARatEnemy::MoveTowardsNextCheckpoint, MoveInterval, true);
-}
-
-
-void ARatEnemy::ApplyDamageToPlayer()
-{
-	// Get the player (assuming Player is the first player in the game)
-	APlayerPawn* Player = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));  // Assumes player is at index 0
-
-	if (Player)
-	{
-		// Apply damage to the player (placeholder value)
-		Player->Health -= 10.0f;  // Example: Decrease player's health by 10
-		UE_LOG(LogTemp, Log, TEXT("Player took damage! Current health: %f"), Player->Health);
-	}
 }
 
 void ARatEnemy::MoveTowardsNextCheckpoint()
@@ -137,7 +143,7 @@ void ARatEnemy::MoveTowardsNextCheckpoint()
 			// Stop rat movement and destroy the rat
 			bIsMoving = false;
 			GetWorldTimerManager().ClearTimer(MovementTimerHandle);
-			Destroy();
+			Death();
 		}
 	}
 	

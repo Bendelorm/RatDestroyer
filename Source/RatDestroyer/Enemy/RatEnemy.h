@@ -52,9 +52,10 @@ protected:
 	AGridManager* GridManager;
 
 public:
-	virtual bool AttackEnemy(float DamageTaken);
+	void AttackEnemy(float DamageTaken);
 
-	
+	void Death();
+
 	FVector StartLocation;
 	FVector NextCheckpoint;
 	FTimerHandle MovementTimerHandle;
@@ -66,11 +67,9 @@ public:
 	int32 CurrentCheckpointIndex;
 	
 	//Functions
-	
-	void ApplyDamageToPlayer();
-	void MoveTowardsNextCheckpoint();
-	void startPath();
-	
 
+	void MoveTowardsNextCheckpoint();
+
+	void startPath();
 	
 };

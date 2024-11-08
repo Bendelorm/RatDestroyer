@@ -8,6 +8,8 @@
 #include "Components/BoxComponent.h"
 #include "RDTowerActor.generated.h"
 
+class ARatEnemy;
+class USphereComponent;
 class ATile;
 
 UCLASS()
@@ -30,6 +32,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
 
+
 	//Variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	int32 BaseDamage;
@@ -37,12 +40,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	int32 BaseCost;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BaseAttackTime;
+
 	//Functions
+
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
-
 };

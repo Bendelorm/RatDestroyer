@@ -255,9 +255,4 @@ void AGridManager::Solve_AStar()
 		TowerManager->Pop();
 	}
 	Algo::Reverse(PathCheckpoints);
-
-	for (int i = 0; i < PathCheckpoints.Num(); i++)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, PathCheckpoints[i].ToString());
-	}
 }
