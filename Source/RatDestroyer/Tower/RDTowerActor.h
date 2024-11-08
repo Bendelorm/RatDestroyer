@@ -8,6 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "RDTowerActor.generated.h"
 
+class AWaveManager;
 class ARatEnemy;
 class USphereComponent;
 class ATile;
@@ -26,11 +27,21 @@ public:
 
 	TObjectPtr<ATile> Tile;
 
+	TObjectPtr<ARatEnemy> Enemy;
+
+	TObjectPtr<AWaveManager> WaveManager;
+
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UStaticMeshComponent* TowerMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	USphereComponent* AttackRangeComponent;
+
 
 
 	//Variables
@@ -40,11 +51,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	int32 BaseCost;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	float BaseAttackTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	float BaseAttackRange;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
+	TArray<AActor*> AttackPriorityQueue;
+
+
+
+
 
 	//Functions
 
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 protected:
 	// Called when the game starts or when spawned

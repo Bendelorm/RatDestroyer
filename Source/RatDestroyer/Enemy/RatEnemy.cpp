@@ -20,6 +20,7 @@ ARatEnemy::ARatEnemy()
 	bIsMoving = false;
 	isAlive = true;
 	CurrentCheckpointIndex = 0;
+	Tags.Add("Enemy");
 	
 	
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
