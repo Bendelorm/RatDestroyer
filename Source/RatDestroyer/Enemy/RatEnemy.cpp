@@ -2,9 +2,12 @@
 
 
 #include "RatEnemy.h"
+
+#include "Engine/DamageEvents.h"
 #include "RatDestroyer/Map/GridManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "RatDestroyer/Player/PlayerPawn.h"
 
 
 ARatEnemy::ARatEnemy()
@@ -69,6 +72,19 @@ void ARatEnemy::startPath()
 }
 
 
+void ARatEnemy::ApplyDamageToPlayer()
+{
+	// Get the player (assuming Player is the first player in the game)
+	APlayerPawn* Player = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));  // Assumes player is at index 0
+
+	if (Player)
+	{
+		// Apply damage to the player (placeholder value)
+		Player->Health -= 10.0f;  // Example: Decrease player's health by 10
+		UE_LOG(LogTemp, Log, TEXT("Player took damage! Current health: %f"), Player->Health);
+	}
+}
+
 void ARatEnemy::MoveTowardsNextCheckpoint()
 {
 	// Checks for the checkpoints and allows movement
@@ -101,10 +117,29 @@ void ARatEnemy::MoveTowardsNextCheckpoint()
 		}
 		else
 		{
-			// Reached the final checkpoint, stop movement
+			// When it has reached the End it Deals Damage to Player and Destorys itself
+			APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			if (PlayerPawn)
+			{
+				// Deal Damage to Player Health here 
+				PlayerPawn->Health -= 10.0f;
+
+				// Displays Health for our Player
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Player Health: %.2f"), PlayerPawn->Health));
+			}
+			if (PlayerPawn->Health <= 0)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Player has died. Quitting game..."));
+				// quits the game for now probably gonna make an Lose screen
+				UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, true);
+			}
+
+			// Stop rat movement and destroy the rat
 			bIsMoving = false;
 			GetWorldTimerManager().ClearTimer(MovementTimerHandle);
+			Destroy();
 		}
 	}
+	
 }
 

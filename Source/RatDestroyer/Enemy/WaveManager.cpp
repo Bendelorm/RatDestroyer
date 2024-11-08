@@ -7,8 +7,6 @@
 #include "RatDestroyer/Map/GridManager.h"
 
 
-
-
 // Sets default values
 AWaveManager::AWaveManager(): GridManager(nullptr), EnemiesSpawned(0), WaveNumber(1)
 {
@@ -98,8 +96,6 @@ void AWaveManager::Spawn()
         UE_LOG(LogTemp, Log, TEXT("Enemy Spawned: %d out of %d"), EnemiesSpawned, NumberOfEnemiesInWave);
     }
 }
-
-
 
 // Called every frame
 void AWaveManager::Tick(float DeltaTime)

@@ -16,6 +16,7 @@
 #include "RatDestroyer/Map/GridManager.h"
 #include "RatDestroyer/Map/Tile.h"
 #include "RatDestroyer/Tower/RDTowerManager.h"
+#include "RatDestroyer/Enemy/RatEnemy.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -31,6 +32,10 @@ APlayerPawn::APlayerPawn()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
 	CameraComponent->SetupAttachment(RootComponent);
 
+	
+	Health = 150.0f;
+
+	
 	ShouldRotate = false;
 	bCanBuild = false;
 	MoveSpeed = FVector2D(500, 500);
@@ -149,17 +154,20 @@ void APlayerPawn::BuildTower(ATile* TargetTile)
 
 }
 
+ 
 void APlayerPawn::UndoTower(const FInputActionValue& Value)
 {
 	TowerManager->Pop();
 }
 
 
+
+
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 
 	if(PlayerController = Cast<APlayerController>(Controller); IsValid(PlayerController))
 	{
@@ -175,7 +183,6 @@ void APlayerPawn::BeginPlay()
 	}
 
 }
-
 
 
 
@@ -241,6 +248,6 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 		//Undo tower
 		EnhancedInputComponent->BindAction(UndoTowerAction, ETriggerEvent::Triggered, this, &APlayerPawn::UndoTower);
-
+		
 	}
 }

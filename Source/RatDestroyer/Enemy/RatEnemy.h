@@ -66,8 +66,8 @@ public:
 	int32 CurrentCheckpointIndex;
 	
 	//Functions
-
-
+	
+	void ApplyDamageToPlayer();
 	void MoveTowardsNextCheckpoint();
 	void startPath();
 	
