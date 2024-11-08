@@ -8,6 +8,20 @@
 #include "RatDestroyer/Map/GridManager.h"
 #include "WaveManager.generated.h"
 
+USTRUCT()
+struct FMyWave
+{
+    GENERATED_BODY()
+
+    //Number of Enemies to spawn in wave
+    UPROPERTY()
+    int32 EnemyCount;        
+
+    //Spawn interval for each Enemy
+    UPROPERTY()
+    float SpawnInterval;    
+};
+
 UCLASS()
 class RATDESTROYER_API AWaveManager : public AActor
 {
@@ -16,48 +30,51 @@ class RATDESTROYER_API AWaveManager : public AActor
 public:	
     // Sets default values for this actor's properties
     AWaveManager();
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
+
+    //Might Delete this
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Wave)
     int32 NumberOfEnemiesInWave;
-    
+
+    //Spawning the right Enemy Class
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wave)
     TSubclassOf<ARatEnemy> TheRat;
-    
+
+    //Just for handling Active or inactive Waves
     UPROPERTY(BlueprintReadWrite, Category = "Wave", meta = (AllowPrivateAccess = "true"))
     bool bActiveWave = false;
-
     
-    UPROPERTY(BlueprintReadWrite)
-    TObjectPtr<AGridManager> NodeStart = nullptr;
-
-    UPROPERTY(BlueprintReadWrite)
-    TObjectPtr<AGridManager> NodeEnd = nullptr;
+    void EnqueueWave();
     
-    void StartWave();
-    //void EndWave();
-    //void SpawnEnemyInWave();
-
-    UFUNCTION(BlueprintCallable, Category = "Spawning")
-    void Spawn();
-
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-    //UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave")
-    //int64 NewEnemiesPerWave;
-    
 private:
 
+    void StartWave();
+    
+    UFUNCTION(BlueprintCallable, Category = "Spawning")
+    void Spawn();
+    
     UPROPERTY()
     AGridManager* GridManager;
     
-    // This is the Timer for spawning of Enemy
-    FTimerHandle WaveTimerHandle;
-    int32 EnemiesSpawned;
-    
+
+    //Timer Handling
     UPROPERTY(EditDefaultsOnly, Category = "Wave")
     FTimerHandle SpawnTimerHandle;
+
+    //This fixes timer for the next wave to spawn
+    FTimerHandle WaveStartTimerHandle;
+
+    //Queue of waves
+    TQueue<FMyWave> WaveQueue;
+    
+    int32 WaveNumber;
+    int32 EnemiesSpawned;
+
+    // This is the Timer for spawning of Enemy
+    float CurrentWaveSpawnInterval;
 
 public:
     // Called every frame
