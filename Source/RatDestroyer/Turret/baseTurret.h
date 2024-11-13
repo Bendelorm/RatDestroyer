@@ -25,10 +25,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
 
-	
-
-
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

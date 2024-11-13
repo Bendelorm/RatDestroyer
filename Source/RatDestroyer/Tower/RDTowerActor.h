@@ -38,6 +38,15 @@ public:
 	int32 BaseDamage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	int32 BaseFireRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	int32 BaseAccuracy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	int32 BaseRange;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	int32 BaseCost;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

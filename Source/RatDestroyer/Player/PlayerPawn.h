@@ -35,6 +35,61 @@ public:
 
 	TObjectPtr<ARDTowerActor> Tower;
 
+	
+	struct NodeUpgrade
+	{
+		int32 NodeData;
+		float damage;
+		float fireRate;
+		float accuracy;
+		float range;
+		float cost;
+		TUniquePtr<NodeUpgrade> Left;
+		TUniquePtr<NodeUpgrade> Right;
+
+		NodeUpgrade(int32 InNodeData, float InDamage, float InFireRate, float InAccuracy, float InRange, float InCost)
+			: NodeData(InNodeData), damage(InDamage), fireRate(InFireRate), accuracy(InAccuracy), range(InRange), cost(InCost),
+			Left(nullptr), Right(nullptr) {}
+
+	};
+
+
+	// Visualization of tree
+   //		  1
+   //		/   \
+    //     2	 3
+	//    / \	 / \
+    //   4   5   6  7
+	
+	class UpgradeTree
+	{
+
+
+	public: 
+		TUniquePtr<NodeUpgrade> Root;
+
+		UpgradeTree()
+		{
+			//set the different values inside the parenthesis
+			//								(Node Number, Damage, FireRate, Accuracy, Range, Cost)
+			Root = MakeUnique<NodeUpgrade>(1, 0.f, 0.f, 0.f, 0.f, 0.f);
+			Root->Left = MakeUnique<NodeUpgrade>(2, 100.f, 100.f, 100.f, 100.f, 100.f);
+			Root->Right = MakeUnique<NodeUpgrade>(3, 100.f, 100.f, 100.f, 100.f, 100.f);
+			Root->Left->Left = MakeUnique<NodeUpgrade>(4, 100.f, 100.f, 100.f, 100.f, 100.f);
+			Root->Left->Right = MakeUnique<NodeUpgrade>(5, 100.f, 100.f, 100.f, 100.f, 100.f);
+			Root->Right->Left = MakeUnique<NodeUpgrade>(6, 100.f, 100.f, 100.f, 100.f, 100.f);
+			Root->Right->Right = MakeUnique<NodeUpgrade>(7, 100.f, 100.f, 100.f, 100.f, 100.f);
+
+		};
+
+		
+
+	};
+
+
+
+
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -69,6 +124,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	bool bCanBuild;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bCanUpgrade;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
 	TSubclassOf<ARDTowerActor> BaseTower;
@@ -134,6 +192,14 @@ public:
 
 	UFUNCTION()
 	void UndoTower(const FInputActionValue& Value);
+
+	//Pre Order Traversal - Node 1, 2 , 4 , 5 , 3 , 6 , 7
+	UFUNCTION()
+	void TraverseTree(NodeUpgrade* root);
+
+	//For applying the new values from the Upgrade tree to the tower 
+	UFUNCTION()
+	void ApplyUpgrade(NodeUpgrade* upgradeNode);
 
 
 	//Functions for making Player take Health
