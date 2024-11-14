@@ -52,8 +52,15 @@ void ARDTowerActor::OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActo
 	if (OtherActor->ActorHasTag("Enemy"))
 	{
 		ARatEnemy* LeavingEnemy = Cast<ARatEnemy>(OtherActor);
-		AttackPriorityQueue.Remove(LeavingEnemy);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("removed at %d"), i ));
+		for (int32 i = 0; i < AttackPriorityQueue.Num(); i++)
+		{
+			if (LeavingEnemy->GetName() == AttackPriorityQueue[i]->GetName())
+			{
+				AttackPriorityQueue.RemoveAt(i);
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("removed at %d"), i));
+				break;
+			}
+		}
 	}
 }
 

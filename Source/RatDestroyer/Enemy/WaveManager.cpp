@@ -31,7 +31,7 @@ void AWaveManager::BeginPlay()
 void AWaveManager::EnqueueWave()
 {
     int32 BaseEnemyCount = 10;  // Number of enemies in the first wave
-    float SpawnInterval = 1.0f; // Spawn interval pr enemy set at 1 second
+    float SpawnInterval = 0.5f; // Spawn interval pr enemy set at 1 second
 
     // Adds 5 more enemies for each Wave passed
     FMyWave NewWave;

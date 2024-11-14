@@ -15,7 +15,7 @@ ARatEnemy::ARatEnemy()
 	
  	// Set this character to call Tick() every frame. 
 	PrimaryActorTick.bCanEverTick = true;
-	MovementSpeed = 300.0f;
+	MovementSpeed = 100.0f;
 	Health = 10;
 	bIsMoving = false;
 	isAlive = true;
