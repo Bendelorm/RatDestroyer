@@ -6,7 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+//#include "Perception/PawnSensingComponent.h"
 #include "RDTowerActor.generated.h"
+
 
 class ARatEnemy;
 class USphereComponent;
@@ -31,6 +33,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sensing")
+	class UPawnSensingComponent* PawnSensingComponent;
+
 
 
 	//Variables

@@ -20,6 +20,14 @@ ARDTowerActor::ARDTowerActor()
 	BaseDamage = 2;
 	BaseAttackTime = 1.0f;
 
+	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
+
+	PawnSensingComponent->SightRadius = 1000.0f;
+	PawnSensingComponent->LoseSightRadius = 1200.0f;
+	PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //360 degree view
+	PawnSensingComponent->bOnlySensePlayers = false;
+	PawnSensingComponent->bHearNoises = false; 
+
 }
 // Called when the game starts or when spawned
 void ARDTowerActor::BeginPlay()
