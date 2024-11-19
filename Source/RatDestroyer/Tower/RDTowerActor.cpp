@@ -34,29 +34,13 @@ ARDTowerActor::ARDTowerActor()
 	PawnSensingComponent->bHearNoises = false; 
 
 }
-void ARDTowerActor::TargetEnemy(APawn* SeenPawn)
-{
-	
-	if (SeenPawn)
-	{
-		ARatEnemy* SeenRat = Cast<ARatEnemy>(SeenPawn);
-		if (SeenRat)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("Seen rat enemy: %s"), *SeenRat->GetName());
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("REEEEEEEEEEEEE")));
-		}
-	}
 
-}
 // Called when the game starts or when spawned
 void ARDTowerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (PawnSensingComponent)
-	{
-		PawnSensingComponent->OnSeePawn.AddDynamic(this, &ARDTowerActor::TargetEnemy);
-	}
+	
 
 
 }

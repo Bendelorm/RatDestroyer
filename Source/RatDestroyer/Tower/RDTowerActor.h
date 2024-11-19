@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "Perception/PawnSensingComponent.h"
+#include "Projectile.h"
 #include "RDTowerActor.generated.h"
 
 
@@ -37,7 +38,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sensing", meta = (AllowPrivateAccess = "true"))
 	UPawnSensingComponent* PawnSensingComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
+	TSubclassOf<AProjectile> Projectile;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "YourGame|Actor", meta = (AllowPrivateAccess = "true"))
+	AProjectile* Bullet; 
 
 	//Variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
@@ -60,8 +65,7 @@ public:
 
 	//Functions
 
-	UFUNCTION()
-	void TargetEnemy(APawn* SeenPawn);
+	
 
 protected:
 	// Called when the game starts or when spawned
