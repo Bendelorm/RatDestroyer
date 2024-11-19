@@ -20,13 +20,32 @@ ARDTowerActor::ARDTowerActor()
 	BaseDamage = 2;
 	BaseAttackTime = 1.0f;
 
+
+	//Creating a sense component so that the Tower knows when and what to target
+
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
 
-	PawnSensingComponent->SightRadius = 1000.0f;
-	PawnSensingComponent->LoseSightRadius = 1200.0f;
-	PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //360 degree view
+	PawnSensingComponent->SightRadius = 100.0f;
+	PawnSensingComponent->HearingThreshold = 0.f;
+	PawnSensingComponent->LOSHearingThreshold = 0.f;
+	PawnSensingComponent->HearingMaxSoundAge = 0.f;
+	PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //360 degree view, set it to 90 for 180 degree 
 	PawnSensingComponent->bOnlySensePlayers = false;
 	PawnSensingComponent->bHearNoises = false; 
+
+}
+void ARDTowerActor::TargetEnemy(APawn* SeenPawn)
+{
+	
+	if (SeenPawn)
+	{
+		ARatEnemy* SeenRat = Cast<ARatEnemy>(SeenPawn);
+		if (SeenRat)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Seen rat enemy: %s"), *SeenRat->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("REEEEEEEEEEEEE")));
+		}
+	}
 
 }
 // Called when the game starts or when spawned
@@ -34,6 +53,12 @@ void ARDTowerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (PawnSensingComponent)
+	{
+		PawnSensingComponent->OnSeePawn.AddDynamic(this, &ARDTowerActor::TargetEnemy);
+	}
+
+
 }
 
 // Called every frame

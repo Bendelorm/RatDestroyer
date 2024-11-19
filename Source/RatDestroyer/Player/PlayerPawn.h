@@ -193,13 +193,13 @@ public:
 	UFUNCTION()
 	void UndoTower(const FInputActionValue& Value);
 
-	//Pre Order Traversal - Node 1, 2 , 4 , 5 , 3 , 6 , 7
-	UFUNCTION()
-	void TraverseTree(NodeUpgrade* root);
+	////Pre Order Traversal - Node 1, 2 , 4 , 5 , 3 , 6 , 7
+	//UFUNCTION()
+	//void TraverseTree(NodeUpgrade* root);
 
-	//For applying the new values from the Upgrade tree to the tower 
-	UFUNCTION()
-	void ApplyUpgrade(NodeUpgrade* upgradeNode);
+	////For applying the new values from the Upgrade tree to the tower 
+	//UFUNCTION()
+	//void ApplyUpgrade(NodeUpgrade* upgradeNode);
 
 
 	//Functions for making Player take Health

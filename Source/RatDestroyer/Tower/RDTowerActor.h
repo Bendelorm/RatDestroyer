@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
-//#include "Perception/PawnSensingComponent.h"
+#include "Perception/PawnSensingComponent.h"
 #include "RDTowerActor.generated.h"
 
 
@@ -34,8 +34,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sensing")
-	class UPawnSensingComponent* PawnSensingComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sensing", meta = (AllowPrivateAccess = "true"))
+	UPawnSensingComponent* PawnSensingComponent;
 
 
 
@@ -60,6 +60,8 @@ public:
 
 	//Functions
 
+	UFUNCTION()
+	void TargetEnemy(APawn* SeenPawn);
 
 protected:
 	// Called when the game starts or when spawned
