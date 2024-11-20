@@ -32,6 +32,8 @@ public:
 	TObjectPtr<USphereComponent> OverlapSphere;
 	
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isAlive;	
 
 protected:
 	// Variables
@@ -45,8 +47,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "RatEnemy")
 	bool bIsMoving;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isAlive;
 	
 	UPROPERTY()
 	AGridManager* GridManager;

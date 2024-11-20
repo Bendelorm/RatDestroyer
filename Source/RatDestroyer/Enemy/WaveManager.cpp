@@ -8,7 +8,7 @@
 
 
 // Sets default values
-AWaveManager::AWaveManager(): GridManager(nullptr), EnemiesSpawned(0), WaveNumber(1)
+AWaveManager::AWaveManager(): GridManager(nullptr), WaveNumber(1), EnemiesSpawned(0)
 {
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
@@ -46,9 +46,16 @@ void AWaveManager::EnqueueWave()
 }
     void AWaveManager::StartWave() 
     {
+    EnemiesAlive.RemoveAll([](ARatEnemy* Enemy) { return !IsValid(Enemy); });
+
+    if (EnemiesAlive.Num() > 0)
+    {
+        //UE_LOG(LogTemp, Log, TEXT("Seeing if all enemies are dead %d."), WaveNumber);
+        return;
+    }
     if (WaveQueue.IsEmpty())
     {
-        UE_LOG(LogTemp, Log, TEXT("Not anymore waves lef in queue"));
+        UE_LOG(LogTemp, Log, TEXT("Not anymore waves left in queue"));
         return;
     }
     FMyWave NextWave;
@@ -77,19 +84,19 @@ void AWaveManager::Spawn()
 
         // Enqueue the next wave 
         EnqueueWave();
-
-        // This is the delay for the start of next wave (15 Sekunder)
-        GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 15.0f, false);  
+        
         return; 
     }
 
-    // Spawn the enemy at the NodeStart
+    // Spawn the Rat on the StartNode
     FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
     ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(TheRat, SpawnLocation, FRotator::ZeroRotator);
 
     if (NewEnemy)
     {
-        EnemiesSpawned++;  
+        EnemiesSpawned++;
+        EnemiesAlive.Add(NewEnemy);
+        
         UE_LOG(LogTemp, Log, TEXT("Enemy Spawned: %d out of %d"), EnemiesSpawned, NumberOfEnemiesInWave);
     }
 }
@@ -98,5 +105,14 @@ void AWaveManager::Spawn()
 void AWaveManager::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-}
 
+    // Removes dead rats from the list
+    EnemiesAlive.RemoveAll([](ARatEnemy* Enemy) { return !IsValid(Enemy); });
+
+    // If there is no wave ongoing and all Rats are dead start timer
+    if (EnemiesAlive.Num() == 0 && !bActiveWave && !GetWorld()->GetTimerManager().IsTimerActive(WaveStartTimerHandle))
+    {
+        // Start 15 second timer when all Rats are dead
+        GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 15.0f, false);
+    }
+}

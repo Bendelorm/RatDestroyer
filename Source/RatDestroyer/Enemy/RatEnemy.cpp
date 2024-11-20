@@ -129,7 +129,7 @@ void ARatEnemy::MoveTowardsNextCheckpoint()
 			if (PlayerPawn)
 			{
 				// Deal Damage to Player Health here 
-				PlayerPawn->Health -= 10.0f;
+				PlayerPawn->Health -= 0.0f;
 
 				// Displays Health for our Player
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Player Health: %.2f"), PlayerPawn->Health));
