@@ -20,19 +20,29 @@ ARDTowerActor::ARDTowerActor()
 	BaseDamage = 2;
 	BaseAttackTime = 1.0f;
 
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+
+	ProjectileSpawnPoint->SetupAttachment(RootComponent);
+	ProjectileSpawnPoint->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f)); // Position above the tower
 
 	//Creating a sense component so that the Tower knows when and what to target
 
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
 
-	PawnSensingComponent->SightRadius = 100.0f;
-	PawnSensingComponent->HearingThreshold = 0.f;
-	PawnSensingComponent->LOSHearingThreshold = 0.f;
-	PawnSensingComponent->HearingMaxSoundAge = 0.f;
-	PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //360 degree view, set it to 90 for 180 degree 
-	PawnSensingComponent->bOnlySensePlayers = false;
-	PawnSensingComponent->bHearNoises = false; 
+		PawnSensingComponent->SightRadius = 100.0f;
+		PawnSensingComponent->HearingThreshold = 0.f;
+		PawnSensingComponent->LOSHearingThreshold = 0.f;
+		PawnSensingComponent->HearingMaxSoundAge = 0.f;
+		PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //360 degree view, set it to 90 for 180 degree 
+		PawnSensingComponent->bOnlySensePlayers = false;
+		PawnSensingComponent->bHearNoises = false;
+		PawnSensingComponent->OnSeePawn.AddDynamic(this, &ARDTowerActor::OnSeePawn);
+	
+}
 
+void ARDTowerActor::OnSeePawn(APawn* Pawn)
+{
+	
 }
 
 // Called when the game starts or when spawned
@@ -40,9 +50,6 @@ void ARDTowerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
-
-
 }
 
 // Called every frame

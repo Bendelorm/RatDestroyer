@@ -10,64 +10,25 @@ AProjectile::AProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 
 
-    MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Bullet"));
-
-    MeshComponent->SetupAttachment(RootComponent);
+    //MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 
 
-    CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
+    
    
-    RootComponent = CollisionSphere; 
+    ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Movement"));
 
-    ProjectileMovement->InitialSpeed = 100.f;
+   
     
 
 }
 
-void AProjectile::TargetEnemy()
-{
-     if (Enemy)
-    {
-        ARatEnemy* RatEnemy = Cast<ARatEnemy>(Enemy);
-        FVector ProjectileLocation = GetActorLocation();
-        FVector EnemyLocation = RatEnemy->GetActorLocation();
-        FVector DirectionToEnemy = ProjectileLocation - EnemyLocation;
-
-        DirectionToEnemy.Normalize();
-
-        ProjectileMovement->Velocity = DirectionToEnemy * ProjectileMovement->InitialSpeed;
-
-        FRotator NewRotation = FRotationMatrix::MakeFromX(DirectionToEnemy).Rotator();
-        SetActorRotation(NewRotation);
-
-        
-        ProjectileMovement->HomingTargetComponent = RatEnemy->GetRootComponent();
-
-        
-        ProjectileMovement->HomingAccelerationMagnitude = 50.0f;  
-
-        FTimerHandle DestroyTimerHandle;
-        GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, this, &AProjectile::ProjectileDestroy, 5.0f, false);  
 
 
-    }
-}
-
-void AProjectile::ProjectileDestroy()
-{
-    Destroy(); 
-}
-
-// Called when the game starts or when spawned
 void AProjectile::BeginPlay()
 {
     Super::BeginPlay();
 
 }
-
-
-
-
 
 
 // Called every frame
