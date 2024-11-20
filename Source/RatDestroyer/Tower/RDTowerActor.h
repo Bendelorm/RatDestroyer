@@ -6,8 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/SceneComponent.h"
-#include "Perception/PawnSensingComponent.h"
 #include "Projectile.h"
 #include "RDTowerActor.generated.h"
 
@@ -30,21 +30,24 @@ public:
 
 	TObjectPtr<ATile> Tile;
 
+	TArray<AActor*> DetectedEnemies;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UStaticMeshComponent* TowerMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	USceneComponent* ProjectileSpawnPoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+	UBoxComponent* TargetRadius;
 
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sensing", meta = (AllowPrivateAccess = "true"))
-	UPawnSensingComponent* PawnSensingComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
 	TSubclassOf<AProjectile> Projectile;
+
+
+
 
 	//Variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
@@ -65,11 +68,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float BaseAttackTime;
 
+	
+
+
 	//Functions
 
 	UFUNCTION()
-	void OnSeePawn(APawn* Pawn);
-	
+	void OnTargetDetected(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnTargetLost(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 protected:
 	// Called when the game starts or when spawned

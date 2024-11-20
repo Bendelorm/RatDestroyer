@@ -23,12 +23,23 @@ ARatEnemy::ARatEnemy()
 	
 	
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
+
+
+	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AI"));
+	StimuliSource->RegisterForSense(UAISense_Sight::StaticClass());
+	StimuliSource->RegisterWithPerceptionSystem();
+
+	Tags.Add(FName("Enemy"));
+
 }
 
 // Called when the game starts or when spawned
 void ARatEnemy::BeginPlay()
 { 
 	Super::BeginPlay();
+
+
+	UE_LOG(LogTemp, Log, TEXT("Rat Enemy Tag: %s"), *GetName());
 
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	GridManager->NodeStart->WorldLocation;

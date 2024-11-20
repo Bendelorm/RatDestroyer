@@ -19,37 +19,60 @@ ARDTowerActor::ARDTowerActor()
 	BaseCost = 10;
 	BaseDamage = 2;
 	BaseAttackTime = 1.0f;
-
-	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
-
-	ProjectileSpawnPoint->SetupAttachment(RootComponent);
-	ProjectileSpawnPoint->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f)); // Position above the tower
-
-	//Creating a sense component so that the Tower knows when and what to target
-
-	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
-
-		PawnSensingComponent->SightRadius = 100.0f;
-		PawnSensingComponent->HearingThreshold = 0.f;
-		PawnSensingComponent->LOSHearingThreshold = 0.f;
-		PawnSensingComponent->HearingMaxSoundAge = 0.f;
-		PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //360 degree view, set it to 90 for 180 degree 
-		PawnSensingComponent->bOnlySensePlayers = false;
-		PawnSensingComponent->bHearNoises = false;
-		PawnSensingComponent->OnSeePawn.AddDynamic(this, &ARDTowerActor::OnSeePawn);
 	
+	TargetRadius = CreateDefaultSubobject<UBoxComponent>(TEXT("TargetRadius"));
+	TargetRadius->SetBoxExtent(FVector(100.f, 100.f, 50.f));
+	TargetRadius->SetCollisionProfileName(TEXT("OverlapAll"));
+
+	TargetRadius->OnComponentBeginOverlap.AddDynamic(this, &ARDTowerActor::OnTargetDetected);
+	TargetRadius->OnComponentEndOverlap.AddDynamic(this, &ARDTowerActor::OnTargetLost);
+
+
+
+	DetectedEnemies.Empty();
+
 }
 
-void ARDTowerActor::OnSeePawn(APawn* Pawn)
+
+
+void ARDTowerActor::OnTargetDetected(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
 {
 	
+	if (OtherActor && OtherActor->ActorHasTag(FName("Enemy")))
+	{
+		ARatEnemy* Enemy = Cast<ARatEnemy>(OtherActor);
+		if (Enemy)
+		{
+			
+			DetectedEnemies.Add(Enemy);
+			UE_LOG(LogTemp, Warning, TEXT("Detected Enemy: %s"), *Enemy->GetName());
+		}
+	}
+
 }
+void ARDTowerActor::OnTargetLost(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor && OtherActor->ActorHasTag(FName("Enemy")))
+	{
+		ARatEnemy* Enemy = Cast<ARatEnemy>(OtherActor);
+		if (Enemy)
+		{
+			DetectedEnemies.Remove(Enemy);
+			UE_LOG(LogTemp, Warning, TEXT("Lost Enemy: %s"), *Enemy->GetName());
+		}
+	}
+
+}
+
 
 // Called when the game starts or when spawned
 void ARDTowerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
 }
 
 // Called every frame

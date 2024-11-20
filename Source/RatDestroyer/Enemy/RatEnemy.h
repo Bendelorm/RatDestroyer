@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "RatDestroyer/Map/GridManager.h"
 #include "GameFramework/Character.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 #include "RatEnemy.generated.h"
 
 
@@ -20,6 +22,9 @@ public:
 	// Sets default values for this character's properties
 	ARatEnemy();
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	UAIPerceptionStimuliSourceComponent* StimuliSource; 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
