@@ -16,6 +16,7 @@
 #include "RatDestroyer/Map/GridManager.h"
 #include "RatDestroyer/Map/Tile.h"
 #include "RatDestroyer/Tower/RDTowerManager.h"
+#include "RatDestroyer/Enemy/WaveManager.h"
 #include "RatDestroyer/Enemy/RatEnemy.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -42,7 +43,7 @@ APlayerPawn::APlayerPawn()
 	ScreenEdgePadding = FVector2D(50, 50);
 	ZoomSpeed = 800;
 	RotationSpeed = 50;
-	Money = 50;
+	Money = 1000;
 
 	SetActorRotation(FRotator::MakeFromEuler(FVector3d(0, -30, 0)));
 
@@ -121,8 +122,15 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 	}
 }
 
-void APlayerPawn::BuildMode(const FInputActionValue& Value)
-{
+void APlayerPawn::BuildMode(const FInputActionValue& Value){
+
+	AWaveManager* WaveManager = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
+
+	if (WaveManager && !WaveManager->bActiveWave)
+	{
+		return;
+	}
+
 	if (bCanBuild)
 	{
 		bCanBuild = false;

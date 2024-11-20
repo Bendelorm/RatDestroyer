@@ -4,6 +4,7 @@
 #include "WaveManager.h"
 #include "RatEnemy.h"
 #include "Kismet/GameplayStatics.h"
+#include "RatDestroyer/Player/PlayerPawn.h"
 #include "RatDestroyer/Map/GridManager.h"
 
 
@@ -67,6 +68,7 @@ void AWaveManager::EnqueueWave()
     bActiveWave = true;
 
     GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AWaveManager::Spawn, CurrentWaveSpawnInterval, true);
+    
     }
 
 void AWaveManager::Spawn()
@@ -114,5 +116,21 @@ void AWaveManager::Tick(float DeltaTime)
     {
         // Start 15 second timer when all Rats are dead
         GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 15.0f, false);
+
+        // Turns on Building
+        APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+        if (PlayerPawn)
+        {
+            PlayerPawn->bCanBuild = true;  // Allow building when wave is over
+        }
+    }
+    else if (bActiveWave)
+    {
+        // If Wave is active turn of building
+        APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+        if (PlayerPawn)
+        {
+            PlayerPawn->bCanBuild = false;  // Prevent building when wave is active
+        }
     }
 }
