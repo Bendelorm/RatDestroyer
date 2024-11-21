@@ -53,7 +53,8 @@ private:
 
     UPROPERTY()
     TArray<ARatEnemy*> EnemiesAlive;
-
+    
+    UFUNCTION(BlueprintCallable, Category = "Wave")
     void StartWave();
     
     UFUNCTION(BlueprintCallable, Category = "Spawning")

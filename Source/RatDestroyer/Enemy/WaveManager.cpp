@@ -32,7 +32,7 @@ void AWaveManager::BeginPlay()
 void AWaveManager::EnqueueWave()
 {
     int32 BaseEnemyCount = 10;  // Number of enemies in the first wave
-    float SpawnInterval = 0.5f; // Spawn interval pr enemy set at 1 second
+    float SpawnInterval = 0.5f; // Spawn interval pr enemy
 
     // Adds 5 more enemies for each Wave passed
     FMyWave NewWave;
@@ -40,7 +40,7 @@ void AWaveManager::EnqueueWave()
     NewWave.SpawnInterval = SpawnInterval;
 
     WaveQueue.Enqueue(NewWave);
-    
+    UE_LOG(LogTemp, Log, TEXT("Enqueued Wave %d with %d enemies"), WaveNumber, NewWave.EnemyCount); 
     WaveNumber++; //increases the wave counter
     
 }
@@ -74,6 +74,8 @@ void AWaveManager::Spawn()
     {
         GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle); 
         bActiveWave = false;
+
+        UE_LOG(LogTemp, Log, TEXT("Wave %d complete. Enemies spawned: %d"), WaveNumber - 1, EnemiesSpawned);
         
         // Enqueue the next wave 
         EnqueueWave();
