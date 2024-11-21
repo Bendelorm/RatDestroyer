@@ -26,7 +26,7 @@ void AWaveManager::BeginPlay()
     GridManager->NodeStart->WorldLocation;
 
     EnqueueWave();
-    StartWave();
+   
 }
 
 void AWaveManager::EnqueueWave()
