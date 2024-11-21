@@ -10,17 +10,20 @@
 #include "RatDestroyer/Player/PlayerPawn.h"
 #include "RDTowerActor.generated.h"
 
+
 class AWaveManager;
 class ARatEnemy;
 class USphereComponent;
 class ATile;
+class UpgradeTree;
+
 
 UCLASS()
 class RATDESTROYER_API ARDTowerActor : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+	public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -67,7 +70,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "FireSpeed")
 	float LaunchSpeed = 4000;
 
+	class UpgradeTree* UpgradeTreePTR;
 
+
+	
 
 	//Functions
 
@@ -80,6 +86,7 @@ public:
 	
 
 	/////////////////  Upgrade system /////////////////////
+	
 	struct NodeUpgrade
 	{
 		int32 NodeData;
@@ -99,7 +106,7 @@ public:
 
 
 	// Visualization of tree
-   //		  1
+   //		  1 (root)
    //		/   \
     //     2	 3
 	//    / \	 / \
@@ -116,8 +123,8 @@ public:
 		{
 			//set the different values inside the parenthesis
 			//								(Node Number, Damage, FireRate, Accuracy, Range, Cost)
-			Root = MakeUnique<NodeUpgrade>(1, 0.f, 0.f, 0.f, 0.f, 0.f);
-			Root->Left = MakeUnique<NodeUpgrade>(2, 1.f, 1.f, 0.f, 0.f, 25.f);
+			Root = MakeUnique<NodeUpgrade>      (1,         0.f,      0.f,     0.f,    0.f,   0.f);
+			Root->Left = MakeUnique<NodeUpgrade>(2,        1.f,       1.f,     0.f,    0.f,   25.f);
 			Root->Right = MakeUnique<NodeUpgrade>(3, 0.f, 0.f, 100.f, 100.f, 25.f);
 			Root->Left->Left = MakeUnique<NodeUpgrade>(4, 1.f, 0.f, 0.f, 0.f, 50.f);
 			Root->Left->Right = MakeUnique<NodeUpgrade>(5, 0.f, 1.f, 0.f, 0.f, 50.f);
@@ -132,16 +139,14 @@ public:
 
 
 	////Pre Order Traversal - Node 1, 2 , 4 , 5 , 3 , 6 , 7
-	UFUNCTION()
+	//UFUNCTION()
 	void TraverseTree(NodeUpgrade* root);
 
 	////For applying the new values from the Upgrade tree to the tower 
-	UFUNCTION()
+	//UFUNCTION()
 	void ApplyUpgrade(NodeUpgrade* upgradeNode);
 
 	//////////////////////////////////////////////////
-
-
 
 
 protected:

@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "RatDestroyer/Enemy/RatEnemy.h"
 #include "RatDestroyer/Enemy/WaveManager.h"
+
 // Sets default values
 ARDTowerActor::ARDTowerActor()
 {
@@ -69,42 +70,36 @@ void ARDTowerActor::TraverseTree(NodeUpgrade* root)
 {
 	if (root == nullptr) return;
 
-	// Use a queue for level-order traversal
-	TQueue<NodeUpgrade*> NodeQueue;
-	NodeQueue.Enqueue(root);
-
-	while (!NodeQueue.IsEmpty())
+	// Process the current node first (pre-order)
+	if (PlayerPawn->Money >= root->cost)
 	{
-		NodeUpgrade* CurrentNode = nullptr;
-		NodeQueue.Dequeue(CurrentNode);
+		// Apply the upgrade
+		ApplyUpgrade(root);
 
-		// Check if player can afford the upgrade
-		if (PlayerPawn->Money >= CurrentNode->cost)
-		{
-			// Apply the upgrade
-			ApplyUpgrade(CurrentNode);
+		// Deduct the cost
+		PlayerPawn->Money -= root->cost;
 
-			// Deduct the cost
-			PlayerPawn->Money -= CurrentNode->cost;
+		UE_LOG(LogTemp, Warning, TEXT("Purchased upgrade: Node %d"), root->NodeData);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cannot afford upgrade: Node %d"), root->NodeData);
+		// Stop processing further nodes if a node is unaffordable
+		return;  // No need to continue if one node is unaffordable
+	}
 
-			UE_LOG(LogTemp, Warning, TEXT("Purchased upgrade: Node %d"), CurrentNode->NodeData);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Cannot afford upgrade: Node %d"), CurrentNode->NodeData);
-			// Stop processing further nodes if a node is unaffordable
-			break;
-		}
+	// Now process the left child (if exists)
+	if (root->Left.IsValid())
+	{
+		TraverseTree(root->Left.Get());  // Recursively process left child
+		UE_LOG(LogTemp, Warning, TEXT("left"));
+	}
 
-		// Enqueue the left and right children
-		if (CurrentNode->Left.IsValid())
-		{
-			NodeQueue.Enqueue(CurrentNode->Left.Get());
-		}
-		if (CurrentNode->Right.IsValid())
-		{
-			NodeQueue.Enqueue(CurrentNode->Right.Get());
-		}
+	// Then process the right child (if exists)
+	if (root->Right.IsValid())
+	{
+		TraverseTree(root->Right.Get());  // Recursively process right child
+		UE_LOG(LogTemp, Warning, TEXT("right"));
 	}
 
 }
@@ -112,11 +107,12 @@ void ARDTowerActor::TraverseTree(NodeUpgrade* root)
 
 void ARDTowerActor::ApplyUpgrade(NodeUpgrade* upgradeNode)
 {
-	BaseDamage + upgradeNode->damage;
-	BaseAttackTime + upgradeNode->fireRate;
+	BaseDamage += upgradeNode->damage;
+	BaseAttackTime += upgradeNode->fireRate;
 	//BaseAccuracy + upgradeNode->accuracy;
-	BaseAttackRange + upgradeNode->range;
+	BaseAttackRange += upgradeNode->range;
 }
+
 
 // Called when the game starts or when spawned
 void ARDTowerActor::BeginPlay()
@@ -125,6 +121,12 @@ void ARDTowerActor::BeginPlay()
 
 	WaveManager = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
 	PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawn::StaticClass()));
+
+
+	UpgradeTreePTR = new UpgradeTree();
+
+	TraverseTree(NodeUpgrade* root);
+
 
 
 }

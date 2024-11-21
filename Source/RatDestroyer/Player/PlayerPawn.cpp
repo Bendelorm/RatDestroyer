@@ -119,6 +119,7 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You selected: %s"), *SelectedActor->GetName()));
 			//Code for what happens when you select something
 		}
+
 	}
 }
 
@@ -187,10 +188,12 @@ void APlayerPawn::BeginPlay()
 		GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 		TowerManager = Cast<ARDTowerManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ARDTowerManager::StaticClass()));
 		Tower = Cast<ARDTowerActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ARDTowerActor::StaticClass()));
+		
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(IMC, 0);
 		}
+
 	}
 
 }
