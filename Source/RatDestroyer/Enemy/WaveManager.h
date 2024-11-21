@@ -31,7 +31,7 @@ public:
     // Sets default values for this actor's properties
     AWaveManager();
 
-    //Might Delete this
+    //Sets the NumberOfEnemies in the wave
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Wave)
     int32 NumberOfEnemiesInWave;
 
@@ -44,12 +44,15 @@ public:
     bool bActiveWave = false;
     
     void EnqueueWave();
-    
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
 private:
+
+    UPROPERTY()
+    TArray<ARatEnemy*> EnemiesAlive;
 
     void StartWave();
     

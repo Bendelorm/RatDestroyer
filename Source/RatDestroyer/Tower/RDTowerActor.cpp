@@ -4,7 +4,9 @@
 #include "RDTowerActor.h"
 #include "RatDestroyer/Map/Tile.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "RatDestroyer/Enemy/RatEnemy.h"
+#include "RatDestroyer/Enemy/WaveManager.h"
 // Sets default values
 ARDTowerActor::ARDTowerActor()
 {
@@ -16,62 +18,57 @@ ARDTowerActor::ARDTowerActor()
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("UBoxComponent"));
 	BoxComponent->SetupAttachment(TowerMeshComponent);
+
+	BaseAttackRange = 200.0f;
+	AttackRangeComponent = CreateDefaultSubobject<USphereComponent>(TEXT("AttackRangeComponent"));
+	AttackRangeComponent->SetupAttachment(TowerMeshComponent);
+	AttackRangeComponent->SetSphereRadius(BaseAttackRange);
+	AttackRangeComponent->SetGenerateOverlapEvents(true);
+	AttackRangeComponent->OnComponentBeginOverlap.AddDynamic(this, &ARDTowerActor::OnOverlapBegin);
+	AttackRangeComponent->OnComponentEndOverlap.AddDynamic(this, &ARDTowerActor::OnOverlapEnd);
+
 	BaseCost = 10;
 	BaseDamage = 2;
 	BaseAttackTime = 1.0f;
-	
-	TargetRadius = CreateDefaultSubobject<UBoxComponent>(TEXT("TargetRadius"));
-	TargetRadius->SetBoxExtent(FVector(100.f, 100.f, 50.f));
-	TargetRadius->SetCollisionProfileName(TEXT("OverlapAll"));
-
-	TargetRadius->OnComponentBeginOverlap.AddDynamic(this, &ARDTowerActor::OnTargetDetected);
-	TargetRadius->OnComponentEndOverlap.AddDynamic(this, &ARDTowerActor::OnTargetLost);
-
-
-
-	DetectedEnemies.Empty();
-
+	Enemy = nullptr;
 }
 
-
-
-void ARDTowerActor::OnTargetDetected(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-	const FHitResult& SweepResult)
+void ARDTowerActor::OnOverlapBegin(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
+                                   class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
-	if (OtherActor && OtherActor->ActorHasTag(FName("Enemy")))
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("SOMETHING ENTERED THE SPHERE")));
+
+	if (OtherActor->ActorHasTag("Enemy"))
 	{
-		ARatEnemy* Enemy = Cast<ARatEnemy>(OtherActor);
-		if (Enemy)
+		ARatEnemy* EnteredEnemy = Cast<ARatEnemy>(OtherActor);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s entered"), *EnteredEnemy->GetName()));
+		AttackPriorityQueue.Add(EnteredEnemy);
+	}
+}
+
+void ARDTowerActor::OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
+	class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->ActorHasTag("Enemy"))
+	{
+		ARatEnemy* LeavingEnemy = Cast<ARatEnemy>(OtherActor);
+		for (int32 i = 0; i < AttackPriorityQueue.Num(); i++)
 		{
-			
-			DetectedEnemies.Add(Enemy);
-			UE_LOG(LogTemp, Warning, TEXT("Detected Enemy: %s"), *Enemy->GetName());
+			if (LeavingEnemy->GetName() == AttackPriorityQueue[i]->GetName())
+			{
+				AttackPriorityQueue.RemoveAt(i);
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("removed at %d"), i));
+				break;
+			}
 		}
 	}
-
 }
-void ARDTowerActor::OnTargetLost(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor && OtherActor->ActorHasTag(FName("Enemy")))
-	{
-		ARatEnemy* Enemy = Cast<ARatEnemy>(OtherActor);
-		if (Enemy)
-		{
-			DetectedEnemies.Remove(Enemy);
-			UE_LOG(LogTemp, Warning, TEXT("Lost Enemy: %s"), *Enemy->GetName());
-		}
-	}
-
-}
-
 
 // Called when the game starts or when spawned
 void ARDTowerActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	WaveManager = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
 
 }
 
@@ -79,5 +76,4 @@ void ARDTowerActor::BeginPlay()
 void ARDTowerActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }

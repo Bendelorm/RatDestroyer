@@ -4,11 +4,12 @@
 #include "WaveManager.h"
 #include "RatEnemy.h"
 #include "Kismet/GameplayStatics.h"
+#include "RatDestroyer/Player/PlayerPawn.h"
 #include "RatDestroyer/Map/GridManager.h"
 
 
 // Sets default values
-AWaveManager::AWaveManager(): GridManager(nullptr), EnemiesSpawned(0), WaveNumber(1)
+AWaveManager::AWaveManager(): GridManager(nullptr), WaveNumber(1), EnemiesSpawned(0)
 {
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
@@ -31,7 +32,7 @@ void AWaveManager::BeginPlay()
 void AWaveManager::EnqueueWave()
 {
     int32 BaseEnemyCount = 10;  // Number of enemies in the first wave
-    float SpawnInterval = 1.0f; // Spawn interval pr enemy set at 1 second
+    float SpawnInterval = 0.5f; // Spawn interval pr enemy set at 1 second
 
     // Adds 5 more enemies for each Wave passed
     FMyWave NewWave;
@@ -46,9 +47,16 @@ void AWaveManager::EnqueueWave()
 }
     void AWaveManager::StartWave() 
     {
+    EnemiesAlive.RemoveAll([](ARatEnemy* Enemy) { return !IsValid(Enemy); });
+
+    if (EnemiesAlive.Num() > 0)
+    {
+        //UE_LOG(LogTemp, Log, TEXT("Seeing if all enemies are dead %d."), WaveNumber);
+        return;
+    }
     if (WaveQueue.IsEmpty())
     {
-        UE_LOG(LogTemp, Log, TEXT("Not anymore waves lef in queue"));
+        UE_LOG(LogTemp, Log, TEXT("Not anymore waves left in queue"));
         return;
     }
     FMyWave NextWave;
@@ -60,6 +68,7 @@ void AWaveManager::EnqueueWave()
     bActiveWave = true;
 
     GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AWaveManager::Spawn, CurrentWaveSpawnInterval, true);
+    
     }
 
 void AWaveManager::Spawn()
@@ -77,19 +86,19 @@ void AWaveManager::Spawn()
 
         // Enqueue the next wave 
         EnqueueWave();
-
-        // This is the delay for the start of next wave (15 Sekunder)
-        GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 15.0f, false);  
+        
         return; 
     }
 
-    // Spawn the enemy at the NodeStart
+    // Spawn the Rat on the StartNode
     FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
     ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(TheRat, SpawnLocation, FRotator::ZeroRotator);
 
     if (NewEnemy)
     {
-        EnemiesSpawned++;  
+        EnemiesSpawned++;
+        EnemiesAlive.Add(NewEnemy);
+        
         UE_LOG(LogTemp, Log, TEXT("Enemy Spawned: %d out of %d"), EnemiesSpawned, NumberOfEnemiesInWave);
     }
 }
@@ -98,5 +107,30 @@ void AWaveManager::Spawn()
 void AWaveManager::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-}
 
+    // Removes dead rats from the list
+    EnemiesAlive.RemoveAll([](ARatEnemy* Enemy) { return !IsValid(Enemy); });
+
+    // If there is no wave ongoing and all Rats are dead start timer
+    if (EnemiesAlive.Num() == 0 && !bActiveWave && !GetWorld()->GetTimerManager().IsTimerActive(WaveStartTimerHandle))
+    {
+        // Start 15 second timer when all Rats are dead
+        GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 15.0f, false);
+
+        // Turns on Building
+        APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+        if (PlayerPawn)
+        {
+            PlayerPawn->bCanBuild = true;  // Allow building when wave is over
+        }
+    }
+    else if (bActiveWave)
+    {
+        // If Wave is active turn of building
+        APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+        if (PlayerPawn)
+        {
+            PlayerPawn->bCanBuild = false;  // Prevent building when wave is active
+        }
+    }
+}

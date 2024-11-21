@@ -6,12 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
-#include "Components/SphereComponent.h"
-#include "Components/SceneComponent.h"
-#include "Projectile.h"
 #include "RDTowerActor.generated.h"
 
-
+class AWaveManager;
 class ARatEnemy;
 class USphereComponent;
 class ATile;
@@ -30,7 +27,11 @@ public:
 
 	TObjectPtr<ATile> Tile;
 
-	TArray<AActor*> DetectedEnemies;
+	TObjectPtr<ARatEnemy> Enemy;
+
+	TObjectPtr<AWaveManager> WaveManager;
+
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UStaticMeshComponent* TowerMeshComponent;
@@ -38,14 +39,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UBoxComponent* BoxComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
-	UBoxComponent* TargetRadius;
-
-
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
-	TSubclassOf<AProjectile> Projectile;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	USphereComponent* AttackRangeComponent;
 
 
 
@@ -54,33 +49,28 @@ public:
 	int32 BaseDamage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
-	int32 BaseFireRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
-	int32 BaseAccuracy;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
-	int32 BaseRange;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	int32 BaseCost;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	float BaseAttackTime;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	float BaseAttackRange;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
+	TArray<AActor*> AttackPriorityQueue;
+
+
+
 
 
 	//Functions
 
 	UFUNCTION()
-	void OnTargetDetected(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-		const FHitResult& SweepResult);
+	void OnOverlapBegin(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnTargetLost(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 protected:
 	// Called when the game starts or when spawned

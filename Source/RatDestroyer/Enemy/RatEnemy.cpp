@@ -15,11 +15,12 @@ ARatEnemy::ARatEnemy()
 	
  	// Set this character to call Tick() every frame. 
 	PrimaryActorTick.bCanEverTick = true;
-	MovementSpeed = 300.0f;
+	MovementSpeed = 100.0f;
 	Health = 10;
 	bIsMoving = false;
 	isAlive = true;
 	CurrentCheckpointIndex = 0;
+	Tags.Add("Enemy");
 	
 	
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
@@ -139,7 +140,7 @@ void ARatEnemy::MoveTowardsNextCheckpoint()
 			if (PlayerPawn)
 			{
 				// Deal Damage to Player Health here 
-				PlayerPawn->Health -= 10.0f;
+				PlayerPawn->Health -= 0.0f;
 
 				// Displays Health for our Player
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Player Health: %.2f"), PlayerPawn->Health));
