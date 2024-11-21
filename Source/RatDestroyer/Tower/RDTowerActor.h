@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Projectile.h"
+#include "RatDestroyer/Player/PlayerPawn.h"
 #include "RDTowerActor.generated.h"
 
 class AWaveManager;
@@ -31,7 +33,7 @@ public:
 
 	TObjectPtr<AWaveManager> WaveManager;
 
-
+	TObjectPtr<APlayerPawn> PlayerPawn;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UStaticMeshComponent* TowerMeshComponent;
@@ -41,7 +43,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	USphereComponent* AttackRangeComponent;
-
 
 
 	//Variables
@@ -60,7 +61,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
 	TArray<AActor*> AttackPriorityQueue;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	TSubclassOf<AProjectile> Projectile;
 
+	UPROPERTY(EditDefaultsOnly, Category = "FireSpeed")
+	float LaunchSpeed = 4000;
 
 
 
@@ -71,6 +76,73 @@ public:
 
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	
+
+	/////////////////  Upgrade system /////////////////////
+	struct NodeUpgrade
+	{
+		int32 NodeData;
+		float damage;
+		float fireRate;
+		float accuracy;
+		float range;
+		float cost;
+		TUniquePtr<NodeUpgrade> Left;
+		TUniquePtr<NodeUpgrade> Right;
+
+		NodeUpgrade(int32 InNodeData, float InDamage, float InFireRate, float InAccuracy, float InRange, float InCost)
+			: NodeData(InNodeData), damage(InDamage), fireRate(InFireRate), accuracy(InAccuracy), range(InRange), cost(InCost),
+			Left(nullptr), Right(nullptr) {}
+
+	};
+
+
+	// Visualization of tree
+   //		  1
+   //		/   \
+    //     2	 3
+	//    / \	 / \
+    //   4   5   6  7
+
+	class UpgradeTree
+	{
+
+
+	public:
+		TUniquePtr<NodeUpgrade> Root;
+
+		UpgradeTree()
+		{
+			//set the different values inside the parenthesis
+			//								(Node Number, Damage, FireRate, Accuracy, Range, Cost)
+			Root = MakeUnique<NodeUpgrade>(1, 0.f, 0.f, 0.f, 0.f, 0.f);
+			Root->Left = MakeUnique<NodeUpgrade>(2, 1.f, 1.f, 0.f, 0.f, 25.f);
+			Root->Right = MakeUnique<NodeUpgrade>(3, 0.f, 0.f, 100.f, 100.f, 25.f);
+			Root->Left->Left = MakeUnique<NodeUpgrade>(4, 1.f, 0.f, 0.f, 0.f, 50.f);
+			Root->Left->Right = MakeUnique<NodeUpgrade>(5, 0.f, 1.f, 0.f, 0.f, 50.f);
+			Root->Right->Left = MakeUnique<NodeUpgrade>(6, 0.f, 0.f, 100.f, 0.f, 50.f);
+			Root->Right->Right = MakeUnique<NodeUpgrade>(7, 0.f, 0.f, 0.f, 100.f, 50.f);
+
+		};
+
+
+
+	};
+
+
+	////Pre Order Traversal - Node 1, 2 , 4 , 5 , 3 , 6 , 7
+	UFUNCTION()
+	void TraverseTree(NodeUpgrade* root);
+
+	////For applying the new values from the Upgrade tree to the tower 
+	UFUNCTION()
+	void ApplyUpgrade(NodeUpgrade* upgradeNode);
+
+	//////////////////////////////////////////////////
+
+
+
 
 protected:
 	// Called when the game starts or when spawned

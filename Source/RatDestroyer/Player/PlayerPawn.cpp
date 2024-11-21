@@ -172,40 +172,6 @@ void APlayerPawn::UndoTower(const FInputActionValue& Value)
 	TowerManager->Pop();
 }
 
-//void APlayerPawn::TraverseTree(NodeUpgrade* root)
-//{
-//	//if (root == nullptr) return;
-//
-//	//// Print node data (or apply logic for upgrades)
-//	//UE_LOG(LogTemp, Warning, TEXT("Node %d: Damage = %f, FireRate = %f, Accuracy = %f, Range = %f, Cost = %f"),
-//	//	root->NodeData, root->damage, root->fireRate, root->accuracy, root->range, root->cost);
-//
-//	//// Recursively traverse the left and right child nodes
-//	//TraverseTree(root->Left.Get());
-//	//TraverseTree(root->Right.Get());
-//
-//}
-//
-//void APlayerPawn::ApplyUpgrade(NodeUpgrade* upgradeNode)
-//{
-//
-//	//if (Money >= upgradeNode->cost)
-//	//{
-//
-//	//	//Applying the upgrade 
-//	//	Tower->BaseDamage += upgradeNode->damage;
-//	//	Tower->BaseFireRate += upgradeNode->fireRate;
-//	//	Tower->BaseAccuracy += upgradeNode->accuracy;
-//	//	Tower->BaseRange += upgradeNode->range;
-//
-//	//	Money -= upgradeNode->cost;
-//
-//
-//	//}
-//
-//}
-
-
 
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()

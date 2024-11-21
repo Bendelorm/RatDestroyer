@@ -21,6 +21,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
 	UProjectileMovementComponent* ProjectileMovement;
 	
+	UFUNCTION()
+	void LaunchProjectile(float Speed); 
+	
+	
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,5 +33,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 
 };

@@ -12,12 +12,18 @@ AProjectile::AProjectile()
    
     ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Movement"));
 
-   
-    
+    ProjectileMovement->InitialSpeed = 1000.f; 
+
+    ProjectileMovement->bAutoActivate = false; 
 
 }
 
 
+
+void AProjectile::LaunchProjectile(float Speed)
+{
+
+}
 
 void AProjectile::BeginPlay()
 {

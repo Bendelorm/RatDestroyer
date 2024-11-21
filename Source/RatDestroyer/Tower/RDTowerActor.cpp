@@ -43,6 +43,7 @@ void ARDTowerActor::OnOverlapBegin(class UPrimitiveComponent* HitComp, class AAc
 		ARatEnemy* EnteredEnemy = Cast<ARatEnemy>(OtherActor);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s entered"), *EnteredEnemy->GetName()));
 		AttackPriorityQueue.Add(EnteredEnemy);
+
 	}
 }
 
@@ -64,11 +65,67 @@ void ARDTowerActor::OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActo
 	}
 }
 
+void ARDTowerActor::TraverseTree(NodeUpgrade* root)
+{
+	if (root == nullptr) return;
+
+	// Use a queue for level-order traversal
+	TQueue<NodeUpgrade*> NodeQueue;
+	NodeQueue.Enqueue(root);
+
+	while (!NodeQueue.IsEmpty())
+	{
+		NodeUpgrade* CurrentNode = nullptr;
+		NodeQueue.Dequeue(CurrentNode);
+
+		// Check if player can afford the upgrade
+		if (PlayerPawn->Money >= CurrentNode->cost)
+		{
+			// Apply the upgrade
+			ApplyUpgrade(CurrentNode);
+
+			// Deduct the cost
+			PlayerPawn->Money -= CurrentNode->cost;
+
+			UE_LOG(LogTemp, Warning, TEXT("Purchased upgrade: Node %d"), CurrentNode->NodeData);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Cannot afford upgrade: Node %d"), CurrentNode->NodeData);
+			// Stop processing further nodes if a node is unaffordable
+			break;
+		}
+
+		// Enqueue the left and right children
+		if (CurrentNode->Left.IsValid())
+		{
+			NodeQueue.Enqueue(CurrentNode->Left.Get());
+		}
+		if (CurrentNode->Right.IsValid())
+		{
+			NodeQueue.Enqueue(CurrentNode->Right.Get());
+		}
+	}
+
+}
+
+
+void ARDTowerActor::ApplyUpgrade(NodeUpgrade* upgradeNode)
+{
+	BaseDamage + upgradeNode->damage;
+	BaseAttackTime + upgradeNode->fireRate;
+	//BaseAccuracy + upgradeNode->accuracy;
+	BaseAttackRange + upgradeNode->range;
+}
+
 // Called when the game starts or when spawned
 void ARDTowerActor::BeginPlay()
 {
 	Super::BeginPlay();
+
 	WaveManager = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
+	PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawn::StaticClass()));
+
 
 }
 
