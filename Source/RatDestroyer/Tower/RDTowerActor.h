@@ -17,12 +17,69 @@ class USphereComponent;
 class ATile;
 class UpgradeTree;
 
+struct NodeUpgrade
+{
+	int32 NodeData;
+	float damage;
+	float fireRate;
+	float accuracy;
+	float range;
+	float cost;
+	TUniquePtr<NodeUpgrade> Left;
+	TUniquePtr<NodeUpgrade> Right;
+
+	NodeUpgrade(int32 InNodeData, float InDamage, float InFireRate, float InAccuracy, float InRange, float InCost)
+		: NodeData(InNodeData), damage(InDamage), fireRate(InFireRate), accuracy(InAccuracy), range(InRange), cost(InCost),
+		Left(nullptr), Right(nullptr) {}
+
+};
+
+UCLASS()
+class UUpgradeTree : public UObject
+{
+
+	GENERATED_BODY()
+
+public:
+	TUniquePtr<NodeUpgrade> Root;
+
+	UUpgradeTree()
+	{
+		//set the different values inside the parenthesis
+		//								(Node Number, Damage, FireRate, Accuracy, Range, Cost)
+		Root = MakeUnique<NodeUpgrade>(1, 0.f, 0.f, 0.f, 0.f, 0.f);
+		Root->Left = MakeUnique<NodeUpgrade>(2, 1.f, 1.f, 0.f, 0.f, 25.f);
+		Root->Right = MakeUnique<NodeUpgrade>(3, 0.f, 0.f, 100.f, 100.f, 25.f);
+		Root->Left->Left = MakeUnique<NodeUpgrade>(4, 1.f, 0.f, 0.f, 0.f, 50.f);
+		Root->Left->Right = MakeUnique<NodeUpgrade>(5, 0.f, 1.f, 0.f, 0.f, 50.f);
+		Root->Right->Left = MakeUnique<NodeUpgrade>(6, 0.f, 0.f, 100.f, 0.f, 50.f);
+		Root->Right->Right = MakeUnique<NodeUpgrade>(7, 0.f, 0.f, 0.f, 100.f, 50.f);
+
+	};
+
+
+
+};
 
 UCLASS()
 class RATDESTROYER_API ARDTowerActor : public AActor
 {
 	GENERATED_BODY()
-	
+
+	/////////////////  Upgrade system /////////////////////
+
+
+
+
+	// Visualization of tree
+   //		  1 (root)
+   //		/   \
+    //     2	 3
+	//    / \	 / \
+    //   4   5   6  7
+
+
+
 	public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -70,7 +127,8 @@ class RATDESTROYER_API ARDTowerActor : public AActor
 	UPROPERTY(EditDefaultsOnly, Category = "FireSpeed")
 	float LaunchSpeed = 4000;
 
-	class UpgradeTree* UpgradeTreePTR;
+	UPROPERTY()
+	UUpgradeTree* UpgradeTreePTR;
 
 
 	
@@ -85,62 +143,12 @@ class RATDESTROYER_API ARDTowerActor : public AActor
 
 	
 
-	/////////////////  Upgrade system /////////////////////
-	
-	struct NodeUpgrade
-	{
-		int32 NodeData;
-		float damage;
-		float fireRate;
-		float accuracy;
-		float range;
-		float cost;
-		TUniquePtr<NodeUpgrade> Left;
-		TUniquePtr<NodeUpgrade> Right;
 
-		NodeUpgrade(int32 InNodeData, float InDamage, float InFireRate, float InAccuracy, float InRange, float InCost)
-			: NodeData(InNodeData), damage(InDamage), fireRate(InFireRate), accuracy(InAccuracy), range(InRange), cost(InCost),
-			Left(nullptr), Right(nullptr) {}
-
-	};
-
-
-	// Visualization of tree
-   //		  1 (root)
-   //		/   \
-    //     2	 3
-	//    / \	 / \
-    //   4   5   6  7
-
-	class UpgradeTree
-	{
-
-
-	public:
-		TUniquePtr<NodeUpgrade> Root;
-
-		UpgradeTree()
-		{
-			//set the different values inside the parenthesis
-			//								(Node Number, Damage, FireRate, Accuracy, Range, Cost)
-			Root = MakeUnique<NodeUpgrade>      (1,         0.f,      0.f,     0.f,    0.f,   0.f);
-			Root->Left = MakeUnique<NodeUpgrade>(2,        1.f,       1.f,     0.f,    0.f,   25.f);
-			Root->Right = MakeUnique<NodeUpgrade>(3, 0.f, 0.f, 100.f, 100.f, 25.f);
-			Root->Left->Left = MakeUnique<NodeUpgrade>(4, 1.f, 0.f, 0.f, 0.f, 50.f);
-			Root->Left->Right = MakeUnique<NodeUpgrade>(5, 0.f, 1.f, 0.f, 0.f, 50.f);
-			Root->Right->Left = MakeUnique<NodeUpgrade>(6, 0.f, 0.f, 100.f, 0.f, 50.f);
-			Root->Right->Right = MakeUnique<NodeUpgrade>(7, 0.f, 0.f, 0.f, 100.f, 50.f);
-
-		};
-
-
-
-	};
 
 
 	////Pre Order Traversal - Node 1, 2 , 4 , 5 , 3 , 6 , 7
 	//UFUNCTION()
-	void TraverseTree(NodeUpgrade* root);
+	void TraverseTree(UUpgradeTree* root);
 
 	////For applying the new values from the Upgrade tree to the tower 
 	//UFUNCTION()

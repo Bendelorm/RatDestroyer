@@ -66,39 +66,39 @@ void ARDTowerActor::OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActo
 	}
 }
 
-void ARDTowerActor::TraverseTree(NodeUpgrade* root)
+void ARDTowerActor::TraverseTree(UUpgradeTree* root)
 {
 	if (root == nullptr) return;
 
-	// Process the current node first (pre-order)
-	if (PlayerPawn->Money >= root->cost)
-	{
-		// Apply the upgrade
-		ApplyUpgrade(root);
+	//// Process the current node first (pre-order)
+	//if (PlayerPawn->Money >= root->cost)
+	//{
+	//	// Apply the upgrade
+	//	ApplyUpgrade(root);
 
-		// Deduct the cost
-		PlayerPawn->Money -= root->cost;
+	//	// Deduct the cost
+	//	PlayerPawn->Money -= root->cost;
 
-		UE_LOG(LogTemp, Warning, TEXT("Purchased upgrade: Node %d"), root->NodeData);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Cannot afford upgrade: Node %d"), root->NodeData);
-		// Stop processing further nodes if a node is unaffordable
-		return;  // No need to continue if one node is unaffordable
-	}
+	//	UE_LOG(LogTemp, Warning, TEXT("Purchased upgrade: Node %d"), root->NodeData);
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Cannot afford upgrade: Node %d"), root->NodeData);
+	//	// Stop processing further nodes if a node is unaffordable
+	//	return;  // No need to continue if one node is unaffordable
+	//}
 
 	// Now process the left child (if exists)
-	if (root->Left.IsValid())
+	if (root->Root->Left.IsValid())
 	{
-		TraverseTree(root->Left.Get());  // Recursively process left child
+		//TraverseTree(root->Root->Left);  // Recursively process left child
 		UE_LOG(LogTemp, Warning, TEXT("left"));
 	}
 
 	// Then process the right child (if exists)
-	if (root->Right.IsValid())
+	if (root->Root->Right.IsValid())
 	{
-		TraverseTree(root->Right.Get());  // Recursively process right child
+		//TraverseTree(root->Right.Get());  // Recursively process right child
 		UE_LOG(LogTemp, Warning, TEXT("right"));
 	}
 
@@ -122,10 +122,9 @@ void ARDTowerActor::BeginPlay()
 	WaveManager = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
 	PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawn::StaticClass()));
 
+	UpgradeTreePTR = CreateDefaultSubobject<UUpgradeTree>("TowerPointer");
 
-	UpgradeTreePTR = new UpgradeTree();
-
-	TraverseTree(NodeUpgrade* root);
+	TraverseTree(UpgradeTreePTR);
 
 
 
