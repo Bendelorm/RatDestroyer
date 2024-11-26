@@ -16,27 +16,16 @@ class RATDESTROYER_API ARatEnemy : public ACharacter
 	GENERATED_BODY()
 
 public:
-	
 	// Sets default values for this character's properties
 	ARatEnemy();
-	
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
 	
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> OverlapSphere;
 	
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isAlive;	
-
-protected:
-	// Variables
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RatEnemy")
 	float MovementSpeed;
@@ -47,29 +36,30 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "RatEnemy")
 	bool bIsMoving;
 
-	
 	UPROPERTY()
 	AGridManager* GridManager;
-
-public:
+	
 	void AttackEnemy(float DamageTaken);
 
 	void Death();
 
+	void MoveTowardsNextCheckpoint();
+
+	void startPath();
+
 	FVector StartLocation;
-	FVector NextCheckpoint;
-	FTimerHandle MovementTimerHandle;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	TSubclassOf<ARatEnemy> EnemyClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 CurrentCheckpointIndex;
 	
-	//Functions
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
-	void MoveTowardsNextCheckpoint();
-
-	void startPath();
-	
+private:
+	FTimerHandle MovementTimerHandle;
+	FVector NextCheckpoint;
 };

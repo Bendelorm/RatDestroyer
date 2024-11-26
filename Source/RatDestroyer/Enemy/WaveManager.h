@@ -45,12 +45,18 @@ public:
     
     void EnqueueWave();
 
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
+    
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
 private:
 
+    UPROPERTY()
+    AGridManager* GridManager;
+    
     UPROPERTY()
     TArray<ARatEnemy*> EnemiesAlive;
     
@@ -60,10 +66,9 @@ private:
     UFUNCTION(BlueprintCallable, Category = "Spawning")
     void Spawn();
     
-    UPROPERTY()
-    AGridManager* GridManager;
+    //Queue of waves
+    TQueue<FMyWave> WaveQueue;
     
-
     //Timer Handling
     UPROPERTY(EditDefaultsOnly, Category = "Wave")
     FTimerHandle SpawnTimerHandle;
@@ -71,18 +76,13 @@ private:
     //This fixes timer for the next wave to spawn
     FTimerHandle WaveStartTimerHandle;
 
-    //Queue of waves
-    TQueue<FMyWave> WaveQueue;
+
     
     int32 WaveNumber;
     int32 EnemiesSpawned;
 
     // This is the Timer for spawning of Enemy
     float CurrentWaveSpawnInterval;
-
-public:
-    // Called every frame
-    virtual void Tick(float DeltaTime) override;
-
+    
 };
 

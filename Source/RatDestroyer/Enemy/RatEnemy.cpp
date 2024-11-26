@@ -3,7 +3,6 @@
 
 #include "RatEnemy.h"
 
-#include "Engine/DamageEvents.h"
 #include "RatDestroyer/Map/GridManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
