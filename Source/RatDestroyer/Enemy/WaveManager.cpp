@@ -32,7 +32,7 @@ void AWaveManager::BeginPlay()
 void AWaveManager::EnqueueWave()
 {
     int32 BaseEnemyCount = 10;  // Number of enemies in the first wave
-    float SpawnInterval = 0.5f; // Spawn interval pr enemy set at 1 second
+    float SpawnInterval = 0.5f; // Spawn interval pr enemy
 
     // Adds 5 more enemies for each Wave passed
     FMyWave NewWave;
@@ -40,25 +40,18 @@ void AWaveManager::EnqueueWave()
     NewWave.SpawnInterval = SpawnInterval;
 
     WaveQueue.Enqueue(NewWave);
-
     UE_LOG(LogTemp, Log, TEXT("Enqueued Wave %d with %d enemies"), WaveNumber, NewWave.EnemyCount); 
     WaveNumber++; //increases the wave counter
     
 }
     void AWaveManager::StartWave() 
     {
-    EnemiesAlive.RemoveAll([](ARatEnemy* Enemy) { return !IsValid(Enemy); });
-
-    if (EnemiesAlive.Num() > 0)
-    {
-        //UE_LOG(LogTemp, Log, TEXT("Seeing if all enemies are dead %d."), WaveNumber);
-        return;
-    }
     if (WaveQueue.IsEmpty())
     {
-        UE_LOG(LogTemp, Log, TEXT("Not anymore waves left in queue"));
         return;
     }
+    GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle); 
+   
     FMyWave NextWave;
     WaveQueue.Dequeue(NextWave);
 
@@ -81,9 +74,9 @@ void AWaveManager::Spawn()
     {
         GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle); 
         bActiveWave = false;
-        
-        UE_LOG(LogTemp, Log, TEXT("Wave %d complete. Enemies spawned: %d"), WaveNumber - 1, EnemiesSpawned);
 
+        UE_LOG(LogTemp, Log, TEXT("Wave %d complete. Enemies spawned: %d"), WaveNumber - 1, EnemiesSpawned);
+        
         // Enqueue the next wave 
         EnqueueWave();
         
@@ -99,7 +92,6 @@ void AWaveManager::Spawn()
         EnemiesSpawned++;
         EnemiesAlive.Add(NewEnemy);
         
-        UE_LOG(LogTemp, Log, TEXT("Enemy Spawned: %d out of %d"), EnemiesSpawned, NumberOfEnemiesInWave);
     }
 }
 
@@ -117,20 +109,20 @@ void AWaveManager::Tick(float DeltaTime)
         // Start 15 second timer when all Rats are dead
         GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 15.0f, false);
 
-        // Turns on Building
+        // Turns on Building when wave is done
         APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
         if (PlayerPawn)
         {
-            PlayerPawn->bCanBuild = true;  // Allow building when wave is over
+            PlayerPawn->bCanBuild = true;  
         }
     }
     else if (bActiveWave)
     {
-        // If Wave is active turn of building
+        // Turns of building when wave is active
         APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
         if (PlayerPawn)
         {
-            PlayerPawn->bCanBuild = false;  // Prevent building when wave is active
+            PlayerPawn->bCanBuild = false;  
         }
     }
 }
