@@ -76,6 +76,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")
 	int32 Money;
 
+	//Functions for making Player take Health
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Health")
+	float Health;
 
 
 	//Input Mapping Context and Actions
@@ -136,9 +139,6 @@ public:
 	void UndoTower(const FInputActionValue& Value);
 
 
-	//Functions for making Player take Health
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Health")
-	float Health;
 
 protected:
 	// Called when the game starts or when spawned

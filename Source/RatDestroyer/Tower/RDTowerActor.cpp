@@ -4,6 +4,7 @@
 #include "RDTowerActor.h"
 #include "RatDestroyer/Map/Tile.h"
 #include "Components/SphereComponent.h"
+#include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "RatDestroyer/Enemy/RatEnemy.h"
 #include "RatDestroyer/Enemy/WaveManager.h"
@@ -18,6 +19,9 @@ ARDTowerActor::ARDTowerActor()
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("UBoxComponent"));
 	BoxComponent->SetupAttachment(TowerMeshComponent);
+
+	AttackComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("AttackComponent"));
+	AttackComponent->SetupAttachment(TowerMeshComponent);
 
 	BaseAttackRange = 200.0f;
 	AttackRangeComponent = CreateDefaultSubobject<USphereComponent>(TEXT("AttackRangeComponent"));
@@ -36,13 +40,12 @@ ARDTowerActor::ARDTowerActor()
 void ARDTowerActor::OnOverlapBegin(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
                                    class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("SOMETHING ENTERED THE SPHERE")));
-
 	if (OtherActor->ActorHasTag("Enemy"))
 	{
 		ARatEnemy* EnteredEnemy = Cast<ARatEnemy>(OtherActor);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s entered"), *EnteredEnemy->GetName()));
 		AttackPriorityQueue.Add(EnteredEnemy);
+		TowerAttackEnemy();
 	}
 }
 
@@ -57,9 +60,43 @@ void ARDTowerActor::OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActo
 			if (LeavingEnemy->GetName() == AttackPriorityQueue[i]->GetName())
 			{
 				AttackPriorityQueue.RemoveAt(i);
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("removed at %d"), i));
 				break;
 			}
+		}
+	}
+}
+
+void ARDTowerActor::TowerAttackEnemy()
+{
+	if (AttackPriorityQueue.Num() > 0 && AttackPriorityQueue[0]->ActorHasTag("Enemy"))
+	{
+		if (AttackPriorityQueue[0] != nullptr)
+		{
+			ARatEnemy* TargetEnemy = Cast<ARatEnemy>(AttackPriorityQueue[0]);
+			FVector GunLoc = AttackComponent->GetComponentLocation();
+			FVector TargetLoc = TargetEnemy->GetActorLocation();
+			FVector Direction = (TargetLoc - GunLoc);
+			Direction.Normalize();
+			FRotator LookAtRotation = Direction.Rotation();
+			LookAtRotation.Yaw += 90.0f;
+			AttackComponent->SetWorldRotation(LookAtRotation);
+			if (FireAnimation != nullptr)
+			{
+				UAnimInstance* AnimInstance = AttackComponent->GetAnimInstance();
+				if (AnimInstance != nullptr)
+				{
+					AnimInstance->Montage_Play(FireAnimation, 1.f);
+				}
+			}
+			TargetEnemy->AttackEnemy(BaseDamage);
+
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s Took damage"), *TargetEnemy->GetName()));
+			GetWorldTimerManager().SetTimer(TimerHandle, this, &ARDTowerActor::TowerAttackEnemy, BaseAttackTime, false);
+		}
+		else
+		{
+			//Search for enemy again after 0.1 second
+			GetWorldTimerManager().SetTimer(TimerHandle, this, &ARDTowerActor::TowerAttackEnemy, 0.1f, false);
 		}
 	}
 }
