@@ -11,6 +11,7 @@ void UHealthBar::NativeConstruct()
 
 	Player = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
+	Wave = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
 }
 
 float UHealthBar::CalcHealthPercentage()
@@ -32,4 +33,25 @@ float UHealthBar::GetMoney()
 	}
 
 	return 0.0f;
+}
+
+float UHealthBar::GetWave()
+{
+
+	if (Wave)
+	{
+
+		return Wave->WaveNumber - 1;
+
+	}
+
+
+	return 0.0f;
+}
+
+int32 UHealthBar::GetEnemy()
+{
+
+	return Wave->EnemiesAlive.Num();
+
 }

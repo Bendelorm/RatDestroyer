@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "RatDestroyer/Player/PlayerPawn.h"
+#include "RatDestroyer/Enemy/WaveManager.h"
 #include "HealthBar.generated.h"
 
 /**
@@ -26,11 +27,20 @@ protected:
 	UFUNCTION(BlueprintPure)
 	float GetMoney();
 
+	UFUNCTION(BlueprintPure)
+	float GetWave();
+
+	UFUNCTION(BlueprintPure)
+	int32 GetEnemy();
+
+
+
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<APlayerPawn> Player;
 
-
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<AWaveManager> Wave;
 
 
 };
