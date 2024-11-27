@@ -35,7 +35,7 @@ void AWaveManager::EnqueueWave()
     int32 BaseEnemyCount = 3;  // Number of enemies in the first wave
     float SpawnInterval = 1.0f; // Spawn interval pr enemy
 
-    // Adds 5 more enemies for each Wave passed
+    // Adds 2 more enemies for each Wave passed
     FMyWave NewWave;
     NewWave.EnemyCount = BaseEnemyCount + ((WaveNumber - 1) * 2); 
     NewWave.SpawnInterval = SpawnInterval;
