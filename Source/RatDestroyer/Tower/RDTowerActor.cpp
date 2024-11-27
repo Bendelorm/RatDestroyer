@@ -43,7 +43,7 @@ void ARDTowerActor::OnOverlapBegin(class UPrimitiveComponent* HitComp, class AAc
 	if (OtherActor->ActorHasTag("Enemy"))
 	{
 		ARatEnemy* EnteredEnemy = Cast<ARatEnemy>(OtherActor);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s entered"), *EnteredEnemy->GetName()));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s entered"), *EnteredEnemy->GetName()));
 		AttackPriorityQueue.Add(EnteredEnemy);
 		if (Enemy == nullptr)
 		{
@@ -62,6 +62,7 @@ void ARDTowerActor::OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActo
 		{
 			if (LeavingEnemy->GetName() == AttackPriorityQueue[i]->GetName())
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s left"), *LeavingEnemy->GetName()));
 				AttackPriorityQueue.RemoveAt(i);
 				break;
 			}
@@ -92,9 +93,10 @@ void ARDTowerActor::TowerAttackEnemy()
 					AnimInstance->Montage_Play(FireAnimation, 1.f);
 				}
 			}
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s attacked"), *this->GetName()));
 			TargetEnemy->AttackEnemy(BaseDamage);
 
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s Took damage"), *TargetEnemy->GetName()));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s Took damage"), *TargetEnemy->GetName()));
 			GetWorldTimerManager().SetTimer(TimerHandle, this, &ARDTowerActor::TowerAttackEnemy, BaseAttackTime, false);
 		}
 		else
@@ -110,11 +112,15 @@ void ARDTowerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	WaveManager = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
-
 }
 
 // Called every frame
 void ARDTowerActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (WaveManager->bCleanTowerArray)
+	{
+		AttackPriorityQueue.Empty();
+		Enemy = nullptr;
+	}
 }

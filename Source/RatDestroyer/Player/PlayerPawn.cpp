@@ -45,6 +45,7 @@ APlayerPawn::APlayerPawn()
 	ZoomSpeed = 800;
 	RotationSpeed = 50;
 	Money = 50;
+	MaxHealth = 150.0f;
 
 	SetActorRotation(FRotator::MakeFromEuler(FVector3d(0, -30, 0)));
 

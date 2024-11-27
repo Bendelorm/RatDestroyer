@@ -13,9 +13,10 @@ AWaveManager::AWaveManager(): GridManager(nullptr), WaveNumber(1), EnemiesSpawne
 {
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
-    NumberOfEnemiesInWave = 10;
+    NumberOfEnemiesInWave = 3;
     bActiveWave = false;
     EnemiesSpawned = 0;
+    bCleanTowerArray = false;
 }
 
 // Called when the game starts or when spawned
@@ -31,12 +32,12 @@ void AWaveManager::BeginPlay()
 
 void AWaveManager::EnqueueWave()
 {
-    int32 BaseEnemyCount = 10;  // Number of enemies in the first wave
-    float SpawnInterval = 0.5f; // Spawn interval pr enemy
+    int32 BaseEnemyCount = 3;  // Number of enemies in the first wave
+    float SpawnInterval = 1.0f; // Spawn interval pr enemy
 
     // Adds 5 more enemies for each Wave passed
     FMyWave NewWave;
-    NewWave.EnemyCount = BaseEnemyCount + (WaveNumber - 1) * 5; 
+    NewWave.EnemyCount = BaseEnemyCount + ((WaveNumber - 1) * 2); 
     NewWave.SpawnInterval = SpawnInterval;
 
     WaveQueue.Enqueue(NewWave);
@@ -59,6 +60,7 @@ void AWaveManager::EnqueueWave()
     CurrentWaveSpawnInterval = NextWave.SpawnInterval;
     EnemiesSpawned = 0;
     bActiveWave = true;
+    bCleanTowerArray = false;
 
     GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AWaveManager::Spawn, CurrentWaveSpawnInterval, true);
     
@@ -115,6 +117,7 @@ void AWaveManager::Tick(float DeltaTime)
         {
             PlayerPawn->bCanBuild = true;
             PlayerPawn->bCanUndo = true;
+            bCleanTowerArray = true;
             GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("True")));
 
         }
@@ -127,8 +130,6 @@ void AWaveManager::Tick(float DeltaTime)
         {
             PlayerPawn->bCanBuild = false;
             PlayerPawn->bCanUndo = false;
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("False")));
-
         }
     }
 }

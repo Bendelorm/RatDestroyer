@@ -86,6 +86,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Health")
 	float Health;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Health")
+	float MaxHealth;
+
 
 	//Input Mapping Context and Actions
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")

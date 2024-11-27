@@ -14,8 +14,8 @@ ARatEnemy::ARatEnemy()
 	
  	// Set this character to call Tick() every frame. 
 	PrimaryActorTick.bCanEverTick = true;
-	MovementSpeed = 100.0f;
-	Health = 10;
+	MovementSpeed = 300.0f;
+	Health = 20;
 	bIsMoving = false;
 	isAlive = true;
 	CurrentCheckpointIndex = 0;
@@ -68,7 +68,7 @@ void ARatEnemy::Death()
 		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 		if (PlayerPawn)
 		{
-			PlayerPawn->Money = PlayerPawn->Money + 5;
+			PlayerPawn->Money = PlayerPawn->Money + 3;
 		}
 	}
 }

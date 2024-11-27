@@ -19,7 +19,7 @@ struct FMyWave
 
     //Spawn interval for each Enemy
     UPROPERTY()
-    float SpawnInterval;    
+    float SpawnInterval;
 };
 
 UCLASS()
@@ -47,6 +47,14 @@ public:
 
     // Called every frame
     virtual void Tick(float DeltaTime) override;
+
+    UPROPERTY()
+    bool bCleanTowerArray;
+
+    int32 WaveNumber;
+
+    UPROPERTY()
+    TArray<ARatEnemy*> EnemiesAlive;
     
 protected:
     // Called when the game starts or when spawned
@@ -56,9 +64,6 @@ private:
 
     UPROPERTY()
     AGridManager* GridManager;
-    
-    UPROPERTY()
-    TArray<ARatEnemy*> EnemiesAlive;
     
     UFUNCTION(BlueprintCallable, Category = "Wave")
     void StartWave();
@@ -77,8 +82,6 @@ private:
     FTimerHandle WaveStartTimerHandle;
 
 
-    
-    int32 WaveNumber;
     int32 EnemiesSpawned;
 
     // This is the Timer for spawning of Enemy
