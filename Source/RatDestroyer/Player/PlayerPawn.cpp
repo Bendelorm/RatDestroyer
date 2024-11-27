@@ -43,7 +43,7 @@ APlayerPawn::APlayerPawn()
 	ScreenEdgePadding = FVector2D(50, 50);
 	ZoomSpeed = 800;
 	RotationSpeed = 50;
-	Money = 1000;
+	Money = 50;
 
 	SetActorRotation(FRotator::MakeFromEuler(FVector3d(0, -30, 0)));
 
