@@ -35,7 +35,7 @@ APlayerPawn::APlayerPawn()
 
 	
 	Health = 150.0f;
-
+	MaxHealth = 150.f;
 	
 	ShouldRotate = false;
 	bCanBuild = false;
