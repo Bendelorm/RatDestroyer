@@ -45,7 +45,10 @@ void ARDTowerActor::OnOverlapBegin(class UPrimitiveComponent* HitComp, class AAc
 		ARatEnemy* EnteredEnemy = Cast<ARatEnemy>(OtherActor);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s entered"), *EnteredEnemy->GetName()));
 		AttackPriorityQueue.Add(EnteredEnemy);
-		TowerAttackEnemy();
+		if (Enemy == nullptr)
+		{
+			TowerAttackEnemy();
+		}
 	}
 }
 
@@ -73,6 +76,7 @@ void ARDTowerActor::TowerAttackEnemy()
 		if (AttackPriorityQueue[0] != nullptr)
 		{
 			ARatEnemy* TargetEnemy = Cast<ARatEnemy>(AttackPriorityQueue[0]);
+			Enemy = TargetEnemy;
 			FVector GunLoc = AttackComponent->GetComponentLocation();
 			FVector TargetLoc = TargetEnemy->GetActorLocation();
 			FVector Direction = (TargetLoc - GunLoc);

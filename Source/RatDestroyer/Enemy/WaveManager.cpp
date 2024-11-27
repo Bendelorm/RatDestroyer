@@ -113,7 +113,10 @@ void AWaveManager::Tick(float DeltaTime)
         APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
         if (PlayerPawn)
         {
-            PlayerPawn->bCanBuild = true;  
+            PlayerPawn->bCanBuild = true;
+            PlayerPawn->bCanUndo = true;
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("True")));
+
         }
     }
     else if (bActiveWave)
@@ -122,7 +125,10 @@ void AWaveManager::Tick(float DeltaTime)
         APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
         if (PlayerPawn)
         {
-            PlayerPawn->bCanBuild = false;  
+            PlayerPawn->bCanBuild = false;
+            PlayerPawn->bCanUndo = false;
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("False")));
+
         }
     }
 }

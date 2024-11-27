@@ -17,6 +17,7 @@ class ARDTowerActor;
 class ATile;
 class AGridManager;
 class ARDTowerManager;
+class AWaveManager;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
@@ -34,6 +35,8 @@ public:
 	TObjectPtr<ARDTowerManager> TowerManager;
 
 	TObjectPtr<ARDTowerActor> Tower;
+
+	TObjectPtr<AWaveManager> WaveManager;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -69,6 +72,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	bool bCanBuild;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bCanUndo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
 	TSubclassOf<ARDTowerActor> BaseTower;

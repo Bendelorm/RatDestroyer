@@ -39,6 +39,7 @@ APlayerPawn::APlayerPawn()
 	
 	ShouldRotate = false;
 	bCanBuild = false;
+	bCanUndo = true;
 	MoveSpeed = FVector2D(500, 500);
 	ScreenEdgePadding = FVector2D(50, 50);
 	ZoomSpeed = 800;
@@ -122,10 +123,8 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 	}
 }
 
-void APlayerPawn::BuildMode(const FInputActionValue& Value){
-
-	AWaveManager* WaveManager = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
-
+void APlayerPawn::BuildMode(const FInputActionValue& Value)
+{
 	if (WaveManager && !WaveManager->bActiveWave)
 	{
 		return;
@@ -147,13 +146,13 @@ void APlayerPawn::BuildMode(const FInputActionValue& Value){
 void APlayerPawn::BuildTower(ATile* TargetTile)
 {
 	SelectedTile = TargetTile;
-	AActor* SelectedTower = GetWorld()->SpawnActor(BaseTower);
-	if (SelectedTower == nullptr || SelectedTile == nullptr || SelectedTile->GetHasTower())
+	if (SelectedTile == nullptr || SelectedTile->GetHasTower())
 	{
 		return;
 	}
 	if (Money >= Tower->BaseCost)
 	{
+		AActor* SelectedTower = GetWorld()->SpawnActor(BaseTower);
 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 		SelectedTower->AttachToComponent(SelectedTile->GetStaticMesh(), AttachmentRules, FName(TEXT("TowerSocket")));
 		TowerManager->Push(SelectedTower);
@@ -169,7 +168,12 @@ void APlayerPawn::BuildTower(ATile* TargetTile)
  
 void APlayerPawn::UndoTower(const FInputActionValue& Value)
 {
-	TowerManager->Pop();
+	if (bCanUndo)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("WTF")));
+
+		TowerManager->DeleteTower(TowerManager->Pop());
+	}
 }
 
 
@@ -188,6 +192,7 @@ void APlayerPawn::BeginPlay()
 		GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 		TowerManager = Cast<ARDTowerManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ARDTowerManager::StaticClass()));
 		Tower = Cast<ARDTowerActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ARDTowerActor::StaticClass()));
+		WaveManager = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass()));
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(IMC, 0);
