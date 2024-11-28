@@ -46,6 +46,7 @@ public:
 
 
 	//Variables
+
 	UPROPERTY()
 	TObjectPtr<APlayerController> PlayerController;
 
@@ -82,7 +83,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")
 	int32 Money;
 
-	//Functions for making Player take Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Health")
 	float Health;
 

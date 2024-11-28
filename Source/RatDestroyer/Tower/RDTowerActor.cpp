@@ -62,7 +62,7 @@ void ARDTowerActor::OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActo
 		{
 			if (LeavingEnemy->GetName() == AttackPriorityQueue[i]->GetName())
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s left"), *LeavingEnemy->GetName()));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s left"), *LeavingEnemy->GetName()));
 				AttackPriorityQueue.RemoveAt(i);
 				break;
 			}
@@ -70,6 +70,7 @@ void ARDTowerActor::OnOverlapEnd(class UPrimitiveComponent* HitComp, class AActo
 	}
 }
 
+//Function that calls the enemy taking damage function
 void ARDTowerActor::TowerAttackEnemy()
 {
 	if (AttackPriorityQueue.Num() > 0 && AttackPriorityQueue[0]->ActorHasTag("Enemy"))
@@ -93,7 +94,7 @@ void ARDTowerActor::TowerAttackEnemy()
 					AnimInstance->Montage_Play(FireAnimation, 1.f);
 				}
 			}
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s attacked"), *this->GetName()));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s attacked"), *this->GetName()));
 			TargetEnemy->AttackEnemy(BaseDamage);
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s Took damage"), *TargetEnemy->GetName()));

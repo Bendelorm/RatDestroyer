@@ -97,10 +97,10 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 	FHitResult HitResult;
 	if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult) && bCanBuild)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("bCanBuild is active")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("bCanBuild is active")));
 		if (BaseTower != nullptr && HitResult.GetActor()->ActorHasTag("Buildable"))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Base tower is not a nullptr and u clicked a tile")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Base tower is not a nullptr and u clicked a tile")));
 			ATile* ClickedTile = Cast<ATile>(HitResult.GetActor());
 			for (ATile* TileInArray : GridManager->TileArray)
 			{
@@ -112,13 +112,13 @@ void APlayerPawn::Select(const FInputActionValue& Value)
 			}
 		}
 	}
-	else
+	else //this else is currently unused
 	{
 		AActor* SelectedActor = HitResult.GetActor();
 		if (SelectedActor)
 		{
 			//debug for testing
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You selected: %s"), *SelectedActor->GetName()));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("You selected: %s"), *SelectedActor->GetName()));
 			//Code for what happens when you select something
 		}
 	}
@@ -161,17 +161,17 @@ void APlayerPawn::BuildTower(ATile* TargetTile)
 		int32 TileIndex = GridManager->TileArray.Find(SelectedTile);
 		GridManager->Nodes[TileIndex].bObstacle = true;
 		GridManager->Solve_AStar();
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Placed Tower")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Placed Tower")));
 		Money = Money - Tower->BaseCost;
 	}
 }
 
- 
+ //Input to remove tower from stack and destroy the tower
 void APlayerPawn::UndoTower(const FInputActionValue& Value)
 {
 	if (bCanUndo)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("WTF")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("WTF")));
 
 		TowerManager->DeleteTower(TowerManager->Pop());
 	}
