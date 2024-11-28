@@ -20,7 +20,7 @@ ARDTowerManager::ARDTowerManager()
 
 void ARDTowerManager::Push(AActor* PlacedTower)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Added to stack")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Added to stack")));
 
 	PlacedTowerStack.Add(PlacedTower);
 }
@@ -29,14 +29,14 @@ AActor* ARDTowerManager::Pop()
 {
 	if (IsEmpty())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Stack is empty")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Stack is empty")));
 
 		return nullptr;
 	}
 
 	AActor* TopTowerActor = PlacedTowerStack.Last();
 	PlacedTowerStack.RemoveAt(Size() - 1);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Actor has been removed from stack")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Actor has been removed from stack")));
 	return TopTowerActor;
 }
 

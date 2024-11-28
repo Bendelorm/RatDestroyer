@@ -38,7 +38,6 @@ public:
 	UFUNCTION()
 	AActor* Pop();
 
-
 	UFUNCTION()
 	int32 Size() const;
 

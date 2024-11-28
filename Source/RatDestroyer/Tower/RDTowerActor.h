@@ -25,13 +25,13 @@ public:
 	// Sets default values for this actor's properties
 	ARDTowerActor();
 
+	//Variables
+
 	TObjectPtr<ATile> Tile;
 
 	TObjectPtr<ARatEnemy> Enemy;
 
 	TObjectPtr<AWaveManager> WaveManager;
-
-
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UStaticMeshComponent* TowerMeshComponent;
@@ -48,7 +48,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	UAnimMontage* FireAnimation;
 
-	//Variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	int32 BaseDamage;
 
@@ -64,8 +63,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
 	TArray<AActor*> AttackPriorityQueue;
 	FTimerHandle TimerHandle;
-
-
 
 
 
