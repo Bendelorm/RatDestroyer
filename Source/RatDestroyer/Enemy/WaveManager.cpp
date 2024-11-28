@@ -119,7 +119,7 @@ void AWaveManager::Tick(float DeltaTime)
     if (EnemiesAlive.Num() == 0 && !bActiveWave && !GetWorld()->GetTimerManager().IsTimerActive(WaveStartTimerHandle))
     {
         // Start 15 second timer when all Rats are dead
-        GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 15.0f, false, 30.0f);
+        GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 20.0f, false);
 
         // Turns on Building when wave is done
         APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
