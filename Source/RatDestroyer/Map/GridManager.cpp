@@ -251,7 +251,7 @@ void AGridManager::Solve_AStar()
 	if (NodeEnd->parent == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("No path found to destination!"));
-		TowerManager->Pop();
+		TowerManager->DeleteTower(TowerManager->Pop());
 	}
 	Algo::Reverse(PathCheckpoints);
 }

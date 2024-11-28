@@ -102,8 +102,12 @@ void ARDTowerActor::TowerAttackEnemy()
 		else
 		{
 			//Search for enemy again after 0.1 second
-			GetWorldTimerManager().SetTimer(TimerHandle, this, &ARDTowerActor::TowerAttackEnemy, 0.1f, false);
+			GetWorldTimerManager().SetTimer(TimerHandle, this, &ARDTowerActor::TowerAttackEnemy, 0.01f, false);
 		}
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &ARDTowerActor::TowerAttackEnemy, 0.01f, false);
 	}
 }
 

@@ -13,9 +13,9 @@ AWaveManager::AWaveManager(): GridManager(nullptr), WaveNumber(1), EnemiesSpawne
 {
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
-    NumberOfEnemiesInWave = 3;
-    bActiveWave = false;
-    EnemiesSpawned = 0;
+    NumberOfEnemiesInWave = 3; //Number of Enemies in the first wave
+    bActiveWave = false; 
+    EnemiesSpawned = 0; //Reset Enemy spawn number
     bCleanTowerArray = false;
 }
 
@@ -23,9 +23,13 @@ AWaveManager::AWaveManager(): GridManager(nullptr), WaveNumber(1), EnemiesSpawne
 void AWaveManager::BeginPlay()
 {
     Super::BeginPlay();
+
+    //Gets reference to GridManager actor that is placed 
     GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+    //Access start location of nodeStart
     GridManager->NodeStart->WorldLocation;
 
+    //Starts the first wave after timer
     EnqueueWave();
    
 }
@@ -35,11 +39,12 @@ void AWaveManager::EnqueueWave()
     int32 BaseEnemyCount = 3;  // Number of enemies in the first wave
     float SpawnInterval = 1.0f; // Spawn interval pr enemy
 
-    // Adds 5 more enemies for each Wave passed
+    // Adds 2 more enemies for each Wave passed
     FMyWave NewWave;
     NewWave.EnemyCount = BaseEnemyCount + ((WaveNumber - 1) * 2); 
     NewWave.SpawnInterval = SpawnInterval;
 
+    //Adds new wave to queue
     WaveQueue.Enqueue(NewWave);
     UE_LOG(LogTemp, Log, TEXT("Enqueued Wave %d with %d enemies"), WaveNumber, NewWave.EnemyCount); 
     WaveNumber++; //increases the wave counter
@@ -47,21 +52,26 @@ void AWaveManager::EnqueueWave()
 }
     void AWaveManager::StartWave() 
     {
+    //Checks if there are any waves left in the queue
     if (WaveQueue.IsEmpty())
     {
         return;
     }
+    //Clears spawn timer so it dosent overlap
     GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle); 
-   
+
+    //gets the next wave from the queue
     FMyWave NextWave;
     WaveQueue.Dequeue(NextWave);
 
+    //Wave Parameters
     NumberOfEnemiesInWave = NextWave.EnemyCount;
     CurrentWaveSpawnInterval = NextWave.SpawnInterval;
     EnemiesSpawned = 0;
     bActiveWave = true;
     bCleanTowerArray = false;
 
+    //Starts spawn timer to call the spawn multiple times
     GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AWaveManager::Spawn, CurrentWaveSpawnInterval, true);
     
     }
@@ -118,8 +128,6 @@ void AWaveManager::Tick(float DeltaTime)
             PlayerPawn->bCanBuild = true;
             PlayerPawn->bCanUndo = true;
             bCleanTowerArray = true;
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("True")));
-
         }
     }
     else if (bActiveWave)

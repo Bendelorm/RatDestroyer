@@ -14,6 +14,8 @@ ARatEnemy::ARatEnemy()
 	
  	// Set this character to call Tick() every frame. 
 	PrimaryActorTick.bCanEverTick = true;
+
+	//Sets default options
 	MovementSpeed = 300.0f;
 	Health = 20;
 	bIsMoving = false;
@@ -21,7 +23,7 @@ ARatEnemy::ARatEnemy()
 	CurrentCheckpointIndex = 0;
 	Tags.Add("Enemy");
 	
-	
+	//Sets max walk speed for the movement of the Rat
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }
 
@@ -30,12 +32,15 @@ void ARatEnemy::BeginPlay()
 { 
 	Super::BeginPlay();
 
+	//Access startNode location
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	GridManager->NodeStart->WorldLocation;
+
+	//Begin to move along Path
 	startPath();
 }
 
-
+//Called every frame
 void ARatEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -45,15 +50,16 @@ void ARatEnemy::Tick(float DeltaTime)
 //Function to reduce RatEnemy Health  by the damage number and check if Rat Enemy is still alive
 void ARatEnemy::AttackEnemy(float DamageTaken)
 {
-	UE_LOG(LogTemp, Log, TEXT("%p Shot"), this);
-	this->Health -= DamageTaken;
+	this->Health -= DamageTaken; //Decrease health
 	if(this->Health <= 0)
 	{
+		//If health is below zero mark as not alive and Dead
 		isAlive = false;
 		Death();
 	}
 }
 
+//Handel the death of Rato
 void ARatEnemy::Death()
 {
 
@@ -68,13 +74,14 @@ void ARatEnemy::Death()
 		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 		if (PlayerPawn)
 		{
-			PlayerPawn->Money = PlayerPawn->Money + 3;
+			PlayerPawn->Money = PlayerPawn->Money + 3; 
 		}
 	}
 }
 
 void ARatEnemy::startPath()
 {
+	//just makes sure that GridManager and checkpoints are valid
 	if (!GridManager || GridManager->VisitedCheckpoints.Num() == 0)
 	{
 		return;
@@ -101,7 +108,7 @@ void ARatEnemy::MoveTowardsNextCheckpoint()
 
 	FVector CurrentLocation = GetActorLocation();
 
-	
+	//Marks the next checkpoint
 	FVector TargetLocation = NextCheckpoint;
 	TargetLocation.Z = 100.0f; 
 
@@ -109,7 +116,7 @@ void ARatEnemy::MoveTowardsNextCheckpoint()
 	FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, GetWorld()->GetDeltaSeconds(), MovementSpeed);
 	SetActorLocation(NewLocation);
 
-	
+	//Checks to see if next checkpoint has been reached
 	float DistanceToCheckpoint = FVector::Dist(CurrentLocation, TargetLocation);
 	if (DistanceToCheckpoint <= 10.0f) 
 	{
@@ -129,13 +136,9 @@ void ARatEnemy::MoveTowardsNextCheckpoint()
 			{
 				// Deal Damage to Player Health here 
 				PlayerPawn->Health -= 10.0f;
-
-				// Displays Health for our Player
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Player Health: %.2f"), PlayerPawn->Health));
 			}
 			if (PlayerPawn->Health <= 0)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Player has died. Quitting game..."));
 				// quits the game for now probably gonna make an Lose screen
 				UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, true);
 			}
