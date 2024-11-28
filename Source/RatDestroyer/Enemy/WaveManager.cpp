@@ -1,123 +1,135 @@
-//// Fill out your copyright notice in the Description page of Project Settings.
-//
-//
-//#include "WaveManager.h"
-//#include "EngineUtils.h"
-//
-//
-//
-//// Sets default values
-//AWaveManager::AWaveManager(): GridManager(nullptr), EnemySpawned(0)
-//{
-//    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-//    PrimaryActorTick.bCanEverTick = true;
-//
-//    bActiveWave = false;
-//}
-//
-//// Called when the game starts or when spawned
-//void AWaveManager::BeginPlay()
-//{
-//    Super::BeginPlay();
-//
-//    for (TActorIterator<AGridManager> It(GetWorld()); It;)
-//    {
-//        GridManager = *It;
-//        break;
-//    }
-//    if (!GridManager)
-//    {
-//        UE_LOG(LogTemp, Error, TEXT("WaveManager and gridmanager dont find eachother."));
-//    }
-//}
-//
-//    void AWaveManager::StartWave()
-//    {
-//        if (EnemyClass)
-//        {
-//            bActiveWave = true;
-//            EnemySpawned = 0;
-//
-//            GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &AWaveManager::SpawnEnemyInWave, SpawnInterval, true);
-//        }
-//    }
-//
-//    void AWaveManager::SpawnEnemyInWave()
-//    {
-//    if (EnemySpawned >= NumberOfEnemiesInWave)
-//    {
-//        EndWave();
-//        return;
-//    }
-//        SpawnEnemy(1, TSubclassOf<ARatEnemy>(EnemyClass));
-//        EnemySpawned++;
-//    }
-//
-//    void AWaveManager::EndWave()
-//    {
-//        if(GetWorld())
-//        {
-//            GetWorld()->GetTimerManager().ClearTimer(WaveTimerHandle);
-//        }
-//
-//        bActiveWave = false;
-//
-//        EnemySpawned = 0;
-//    UE_LOG(LogTemp, Warning, TEXT("Wave ended and timer has been reset."));
-//    }
-//
-//void AWaveManager::SpawnEnemy(int32 EnemyCount, TSubclassOf<ARatEnemy> EnemyType)
-//{
-//    if (GridManager == nullptr || EnemyType == nullptr)
-//    {
-//        UE_LOG(LogTemp, Error, TEXT("GridManager or EnemyType is null, cannot spawn enemy."));
-//        return;
-//    }
-//
-//    // Assuming GridManager has TileArray available
-//    if (GridManager->TileArray.Num() < 2)
-//    {
-//        UE_LOG(LogTemp, Error, TEXT("Not enough tiles to spawn an enemy."));
-//        return;
-//    }
-//
-//    ATile* StartTile = GridManager->TileArray[0];
-//    ATile* GoalTile = GridManager->TileArray[GridManager->TileArray.Num() - 1];
-//
-//    FVector SpawnLocation = StartTile->GetActorLocation() + FVector(0, 0, 200.f);
-//   
-//    // Spawn the enemy
-//    ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(EnemyType, SpawnLocation, FRotator::ZeroRotator);
-//
-//    if (NewEnemy)
-//    {
-//        // Use FindPath with ATile* parameters
-//            GridManager->Solve_AStar(); // Assuming FindPath is still in GridManager
-//
-//        // Pass tile locations to the enemy's path as FVectors
-//        //TArray<FVector> PathLocations;
-//        //for (ATile* Tile : Path)
-//        //{
-//        //    PathLocations.Add(Tile->GetActorLocation());
-//        //}
-//
-//        //if (PathLocations.Num() > 0)
-//        //{
-//        //    NewEnemy->SetPath(PathLocations);
-//        //    UE_LOG(LogTemp, Warning, TEXT("Enemy spawned and path set with %d locations."), PathLocations.Num());
-//        //}
-//        //else
-//        //{
-//        //    UE_LOG(LogTemp, Error, TEXT("Failed to find a path for the enemy from %s to %s"), *SpawnLocation.ToString(), *GoalTile->GetActorLocation().ToString());
-//        //    // Optionally, destroy the enemy if the path is invalid
-//        //    NewEnemy->Destroy();
-//        //}
-//    }
-//}
-//
-//// Called every frame
-//void AWaveManager::Tick(float DeltaTime)
-//{
-//    Super::Tick(DeltaTime);
-//}
-//
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "WaveManager.h"
+#include "RatEnemy.h"
+#include "Kismet/GameplayStatics.h"
+#include "RatDestroyer/Player/PlayerPawn.h"
+#include "RatDestroyer/Map/GridManager.h"
+
+
+// Sets default values
+AWaveManager::AWaveManager(): GridManager(nullptr), WaveNumber(1), EnemiesSpawned(0)
+{
+    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
+    NumberOfEnemiesInWave = 3;
+    bActiveWave = false;
+    EnemiesSpawned = 0;
+    bCleanTowerArray = false;
+}
+
+// Called when the game starts or when spawned
+void AWaveManager::BeginPlay()
+{
+    Super::BeginPlay();
+    GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+    GridManager->NodeStart->WorldLocation;
+
+    EnqueueWave();
+   
+}
+
+void AWaveManager::EnqueueWave()
+{
+    int32 BaseEnemyCount = 3;  // Number of enemies in the first wave
+    float SpawnInterval = 1.0f; // Spawn interval pr enemy
+
+    // Adds 5 more enemies for each Wave passed
+    FMyWave NewWave;
+    NewWave.EnemyCount = BaseEnemyCount + ((WaveNumber - 1) * 2); 
+    NewWave.SpawnInterval = SpawnInterval;
+
+    WaveQueue.Enqueue(NewWave);
+    UE_LOG(LogTemp, Log, TEXT("Enqueued Wave %d with %d enemies"), WaveNumber, NewWave.EnemyCount); 
+    WaveNumber++; //increases the wave counter
+    
+}
+    void AWaveManager::StartWave() 
+    {
+    if (WaveQueue.IsEmpty())
+    {
+        return;
+    }
+    GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle); 
+   
+    FMyWave NextWave;
+    WaveQueue.Dequeue(NextWave);
+
+    NumberOfEnemiesInWave = NextWave.EnemyCount;
+    CurrentWaveSpawnInterval = NextWave.SpawnInterval;
+    EnemiesSpawned = 0;
+    bActiveWave = true;
+    bCleanTowerArray = false;
+
+    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AWaveManager::Spawn, CurrentWaveSpawnInterval, true);
+    
+    }
+
+void AWaveManager::Spawn()
+{
+    // Just checks for many enemies need to spawn in 
+    int32 EnemiesToSpawn = NumberOfEnemiesInWave - EnemiesSpawned;
+
+    // Stops the wave when all enemies are spawned in
+    if (EnemiesSpawned >= NumberOfEnemiesInWave)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle); 
+        bActiveWave = false;
+
+        UE_LOG(LogTemp, Log, TEXT("Wave %d complete. Enemies spawned: %d"), WaveNumber - 1, EnemiesSpawned);
+        
+        // Enqueue the next wave 
+        EnqueueWave();
+        
+        return; 
+    }
+
+    // Spawn the Rat on the StartNode
+    FVector SpawnLocation = GridManager->NodeStart->WorldLocation;
+    ARatEnemy* NewEnemy = GetWorld()->SpawnActor<ARatEnemy>(TheRat, SpawnLocation, FRotator::ZeroRotator);
+
+    if (NewEnemy)
+    {
+        EnemiesSpawned++;
+        EnemiesAlive.Add(NewEnemy);
+        
+    }
+}
+
+// Called every frame
+void AWaveManager::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    // Removes dead rats from the list
+    EnemiesAlive.RemoveAll([](ARatEnemy* Enemy) { return !IsValid(Enemy); });
+
+    // If there is no wave ongoing and all Rats are dead start timer
+    if (EnemiesAlive.Num() == 0 && !bActiveWave && !GetWorld()->GetTimerManager().IsTimerActive(WaveStartTimerHandle))
+    {
+        // Start 15 second timer when all Rats are dead
+        GetWorld()->GetTimerManager().SetTimer(WaveStartTimerHandle, this, &AWaveManager::StartWave, 15.0f, false);
+
+        // Turns on Building when wave is done
+        APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+        if (PlayerPawn)
+        {
+            PlayerPawn->bCanBuild = true;
+            PlayerPawn->bCanUndo = true;
+            bCleanTowerArray = true;
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("True")));
+
+        }
+    }
+    else if (bActiveWave)
+    {
+        // Turns of building when wave is active
+        APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+        if (PlayerPawn)
+        {
+            PlayerPawn->bCanBuild = false;
+            PlayerPawn->bCanUndo = false;
+        }
+    }
+}

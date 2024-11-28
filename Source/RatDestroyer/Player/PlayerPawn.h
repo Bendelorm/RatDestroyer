@@ -17,6 +17,7 @@ class ARDTowerActor;
 class ATile;
 class AGridManager;
 class ARDTowerManager;
+class AWaveManager;
 
 UCLASS()
 class RATDESTROYER_API APlayerPawn : public APawn
@@ -32,6 +33,10 @@ public:
 	TObjectPtr<ATile> SelectedTile;
 
 	TObjectPtr<ARDTowerManager> TowerManager;
+
+	TObjectPtr<ARDTowerActor> Tower;
+
+	TObjectPtr<AWaveManager> WaveManager;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -68,8 +73,21 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	bool bCanBuild;
 
+	UPROPERTY(EditDefaultsOnly)
+	bool bCanUndo;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
 	TSubclassOf<ARDTowerActor> BaseTower;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")
+	int32 Money;
+
+	//Functions for making Player take Health
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Health")
+	float Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Health")
+	float MaxHealth;
 
 
 	//Input Mapping Context and Actions

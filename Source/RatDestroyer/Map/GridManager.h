@@ -10,6 +10,8 @@
 
 class ATile;
 class ARatEnemy;
+class ARDTowerManager;
+
 
 USTRUCT(BlueprintType)
 struct FNode
@@ -32,6 +34,7 @@ UCLASS()
 class RATDESTROYER_API AGridManager : public AActor
 {
 	GENERATED_BODY()
+
 	
 public:	
 	// Sets default values for this actor's properties
@@ -40,6 +43,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneComponent;
 
+	TObjectPtr<ARDTowerManager> TowerManager;
 	
 
 protected:
@@ -83,6 +87,8 @@ public:
 	};
 
 	TArray<FVector> VisitedCheckpoints;
+
+	TArray<FVector> PathCheckpoints;
 
 	UFUNCTION()
 	void CreateGraph();

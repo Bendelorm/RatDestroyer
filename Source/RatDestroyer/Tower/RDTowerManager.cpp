@@ -37,19 +37,6 @@ AActor* ARDTowerManager::Pop()
 	AActor* TopTowerActor = PlacedTowerStack.Last();
 	PlacedTowerStack.RemoveAt(Size() - 1);
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Actor has been removed from stack")));
-	ATile* DeletedFromTile = Cast<ATile>(TopTowerActor->GetAttachParentActor());
-	for (ATile* TileInArray : GridManager->TileArray)
-	{
-		if (TileInArray == DeletedFromTile)
-		{
-			ParentTile = TileInArray;
-			ParentTile->SetHasTower(false);
-			int32 TileIndex = GridManager->TileArray.Find(ParentTile);
-			GridManager->Nodes[TileIndex].bObstacle = false;
-			GridManager->Solve_AStar();
-		}
-	}
-	TopTowerActor->Destroy();
 	return TopTowerActor;
 }
 
@@ -61,6 +48,26 @@ int32 ARDTowerManager::Size() const
 bool ARDTowerManager::IsEmpty() const
 {
 	return PlacedTowerStack.Num() == 0;
+}
+
+void ARDTowerManager::DeleteTower(AActor* TowerToBeDeleted)
+{
+	if (TowerToBeDeleted != nullptr)
+	{
+		ATile* DeletedFromTile = Cast<ATile>(TowerToBeDeleted->GetAttachParentActor());
+		for (ATile* TileInArray : GridManager->TileArray)
+		{
+			if (TileInArray == DeletedFromTile)
+			{
+				ParentTile = TileInArray;
+				ParentTile->SetHasTower(false);
+				int32 TileIndex = GridManager->TileArray.Find(ParentTile);
+				GridManager->Nodes[TileIndex].bObstacle = false;
+				GridManager->Solve_AStar();
+			}
+		}
+		TowerToBeDeleted->Destroy();
+	}
 }
 
 // Called when the game starts or when spawned

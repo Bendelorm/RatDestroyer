@@ -32,7 +32,7 @@ ATile::ATile()
 
 void ATile::ChangeMatOnMouseOver(UPrimitiveComponent* TouchedComponent)
 {
-	if (PlayerPawn->bCanBuild)
+	if (PlayerPawn->bCanBuild && !GetHasTower())
 	{
 		TileMeshComponent->SetMaterial(0, MaterialTwo);
 	}

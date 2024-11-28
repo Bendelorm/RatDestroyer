@@ -46,6 +46,8 @@ public:
 	UFUNCTION()
 	bool IsEmpty() const;
 
+	UFUNCTION()
+	void DeleteTower(AActor* TowerToBeDeleted);
 
 protected:
 	// Called when the game starts or when spawned
