@@ -67,7 +67,8 @@ void AGridManager::BeginPlay()
 
 		}
 	}
-	
+	TileArray[0]->bHasTower = true;
+	TileArray[99]->bHasTower = true;
 }
 
 // Called every frame

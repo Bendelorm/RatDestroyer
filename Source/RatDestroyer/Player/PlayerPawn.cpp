@@ -42,8 +42,8 @@ APlayerPawn::APlayerPawn()
 	bCanUndo = true;
 	MoveSpeed = FVector2D(500, 500);
 	ScreenEdgePadding = FVector2D(50, 50);
-	ZoomSpeed = 800;
-	RotationSpeed = 50;
+	ZoomSpeed = 1500;
+	RotationSpeed = 200;
 	Money = 50;
 	MaxHealth = 150.0f;
 
